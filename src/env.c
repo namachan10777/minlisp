@@ -74,7 +74,7 @@ void resist(char* key, struct Node* node) {
 
 struct Node* find(char* key) {
 	for (int64_t level = scope_level; level >= 0; --level) {
-		for (int64_t = env[level].size; i >= 0; ++i) {
+		for (int64_t i = env[level].size; i >= 0; ++i) {
 			printf("%ld %ld\n", level, i);
 			if (strcmp(key, env[level].pairs[i].key) == 0)
 				return env[level].pairs[i].node;
