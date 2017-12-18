@@ -17,7 +17,7 @@ struct Node;
 struct List {
 	//常識的に考えて2^32を超える引数は無いはず
 	struct Node **sexps;
-	uint32_t sexp_num;
+	uint32_t len;
 };
 
 struct Node {
@@ -32,5 +32,7 @@ struct Node {
 		struct List sexp;
 	};
 };
+
+char* pp (struct Node* node);
 
 #endif
