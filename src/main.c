@@ -13,4 +13,5 @@ int main(int argc, char *argv[]) {
 	char* str = pp(node);
 	printf("%s\n", str);
 	printf("ファイル名 : %s", argv[1]);
+	env_init();
 }
