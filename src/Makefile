@@ -16,3 +16,5 @@ main.o: main.c gc.h node.h
 
 build: main.o gc.o
 	$(COMPILER) main.o gc.o -o $(EXE) 
+clean:
+	rm -f *.o minlisp
