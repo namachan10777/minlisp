@@ -20,8 +20,11 @@ main.o: main.c gc.h node.h parser.h
 node.o: node.c node.h
 	$(COMPILER) -o node.o -c node.c -I.
 
-build: main.o gc.o parser.o node.o
-	$(COMPILER) main.o gc.o parser.o node.o -lm -o $(EXE) 
+env.o: env.c env.h gc.h node.h
+	$(COMPILER) -o env.o -c env.c -I.
+
+build: main.o gc.o parser.o node.o env.o
+	$(COMPILER) main.o gc.o parser.o node.o env.o -lm -o $(EXE) 
 
 clean:
 	rm -f *.o minlisp
