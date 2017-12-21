@@ -3,82 +3,110 @@
 #include <string.h>
 #include "env.h"
 #include "node.h"
+#include "macro.h"
 
-uint32_t scope_level = 0;
-uint32_t reserved_level = 0;
-struct Dict* env;
-
-struct Pair {
+struct Var{
 	char* key;
 	struct Node* node;
+	//関数が呼ばれたら++call, 抜けると--calll
+	//ネストが作られたら++nest, 抜けると--nest
+	uint32_t call, nest;
 };
 
-struct Dict {
-	struct Pair* pairs;
-	uint32_t size;
-	uint32_t reserved_size;
-};
+struct Var* vars;
+uint32_t var_reserved_size = 256;
+uint32_t var_size = 0;
 
-void env_reserve (uint32_t new_size) {
-	if (new_size > reserved_level) {
-		struct Dict* new_env = malloc(sizeof(struct Dict*) * new_size);
-		for (size_t i = 0; i < new_size; ++i) {
-			if (i < scope_level)
-				new_env[i] = env[i];
-			else {
-				struct Dict dic = { malloc(sizeof(struct Pair*) * 16), 0, 16 };
-				new_env[i] = dic;
-			}
+uint32_t call_level = 0, nest_level = 0;
+
+size_t* callstack;
+uint32_t callstack_reserved_size = 256;
+uint32_t callstack_size = 0;
+// internal functions
+int64_t find_idx (char* key) {
+	for (int64_t i = var_size - 1; i >= 0 && vars[i].call == call_level; --i) {
+		if (strcmp(key, vars[i].key) == 0)
+			return i;
+	}
+	if (callstack_size > 0) {
+		for (int64_t i = callstack[callstack_size-1]; i >= 0; --i) {
+			if (strcmp(key, vars[i].key) == 0)
+				return i;
 		}
-		env = new_env;
-		reserved_level = new_size;
 	}
+	return -1;
 }
 
-struct Pair* reserve_pairs (struct Dict dict) {
-	struct Pair* buf = malloc(sizeof(struct Pair*) * dict.reserved_size * 2);
-	for (size_t i = 0; i < dict.size; ++i) {
-		buf[i] = dict.pairs[i];
-	}
-	return buf;
-}
-
+// exernal functions
 void env_init() {
-	env_reserve(16);
+	vars = malloc(sizeof(struct Node*) * var_reserved_size);
+	callstack = malloc(sizeof(uint32_t*) * callstack_size);
 }
 
 void into_scope() {
-	if (scope_level >= reserved_level)
-		env_reserve(reserved_level * 2);
-	++scope_level;
+	++nest_level;
 }
 
 void exit_scope() {
-	if (scope_level >= reserved_level)
-		env_reserve(reserved_level * 2);
-	for (size_t i = 0; i < env[scope_level].size; ++i) {
-		//NodeはGCが管理するが名前はGCの管理外なので参照しなくなると解放
-		free(env[scope_level].pairs[i].key);
+	for (int64_t i = var_size - 1; i >= 0; --i) {
+		if (vars[i].nest >= nest_level && vars[i].call == call_level)
+			--var_size;
+		else
+			break;
 	}
-	env[scope_level].size = 0;
-	--scope_level;
+	--nest_level;
 }
 
-void resist(char* key, struct Node* node) {
-	if (env[scope_level].size >= env[scope_level].reserved_size)
-		env[scope_level].pairs = reserve_pairs(env[scope_level]);
-	struct Pair pair = {key, node};
-	env[scope_level].pairs[env[scope_level].size] = pair;
-	++env[scope_level].size;
+bool into_func(char* key) {
+	int64_t fptr;
+	if ((fptr = find_idx(key)) < 0) 
+		return false;
+	if (callstack_size >= callstack_reserved_size)
+		RESERVE(uint32_t, callstack, callstack_reserved_size);
+	callstack[callstack_size++] = fptr;
+	++call_level;
+	return true;
+}
+
+void exit_func() {
+	for(int64_t i = var_size; i >= 0; --i) {
+		if (vars[i].call >= call_level) {
+			//変数名はGCの管理対象外なので参照しなくなった時点で消す
+			free(vars[i].key);
+			--var_size;
+		}
+	}
+	--callstack_size;
+	--call_level;
 }
 
 struct Node* find(char* key) {
-	for (int64_t level = scope_level; level >= 0; --level) {
-		for (int64_t i = env[level].size; i >= 0; ++i) {
-			printf("%ld %ld\n", level, i);
-			if (strcmp(key, env[level].pairs[i].key) == 0)
-				return env[level].pairs[i].node;
-		}
+	int64_t idx;
+	if ((idx = find_idx(key)) < 0)
+		return NULL;
+	return vars[idx].node;
+}
+
+void resist(char* key, struct Node* node) {
+	if (var_size >= var_reserved_size)
+		RESERVE(struct Var, vars, callstack_reserved_size);
+	struct Var var = {key, node, call_level, nest_level};
+	vars[var_size++] = var;
+}
+
+void env_dump() {
+	printf("------------ env dump -------------\n");
+	printf("call %d nest %d\n", call_level, nest_level);
+	printf("----------- vars dump -------------\n");
+	printf("                name | call | nest\n");
+	for (size_t i = 0; i < var_size; ++i) {
+		printf("%20s | %4d | %3d\n", vars[i].key, vars[i].call, vars[i].nest);
 	}
-	return NULL;
+	printf("----------- stack dump -------------\n");
+	if (callstack_size > 0) {
+		for (size_t i = 0; i < callstack_size - 1; ++i) {
+			printf("%ld ->", callstack[i]);
+		}
+		printf("%ld\n", callstack[callstack_size]);
+	}
 }

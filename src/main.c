@@ -2,6 +2,7 @@
 #include <gc.h>
 #include <node.h>
 #include <parser.h>
+#include <env.h>
 
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
