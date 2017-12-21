@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 	gc_init();
 	env_init();
 	struct Node* node = start_parse(argv[1]);
-	char* str = pp(node);
+	char* str = pp(*node);
 	printf("%s\n", str);
 	printf("ファイル名 : %s", argv[1]);
 }

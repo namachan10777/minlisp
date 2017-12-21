@@ -111,9 +111,8 @@ struct Node** reserve_nodes(struct Node** nodes, size_t *buf_size) {
 struct Node* parse(const char *str, size_t *idx) {
 	if (str[*idx] == EOF) return NULL;
 	else if (str[*idx] == '(') {
-		struct Node** nodes = malloc(sizeof(struct Node*) * 2);
-		size_t node_num = 0, node_buf_size = 2;
-
+		struct Node* node = gc_alloc();
+		node->tag = Nil;
 		for (*idx = *idx+1;;) {
 			//reduce動作
 			if (str[*idx] == ')') {
@@ -128,20 +127,15 @@ struct Node* parse(const char *str, size_t *idx) {
 				continue;
 			}
 			else {
-				if (node_num >= node_buf_size)
-					nodes = reserve_nodes(nodes, &node_buf_size);
-				struct Node* node = parse(str, idx);
-				if (node == NULL) return NULL;
-				nodes[node_num++] = node;
+				struct Node* car = parse(str, idx);
+				if (car == NULL) return NULL;
+				struct Node* sexp = gc_alloc();
+				sexp->sexp.car = car;
+				sexp->sexp.cdr = node;
+				sexp->tag = Sexp;
+				node = sexp;
 			}
 		}
-		struct List list;
-		list.sexps = nodes;
-		list.len = node_num;
-
-		struct Node* node = gc_alloc();
-		node->tag = Sexp;
-		node->sexp = list;
 		return node;
 	}
 	else if (str[*idx] == '"') return parse_str(str, idx);
