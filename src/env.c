@@ -102,3 +102,11 @@ void env_dump() {
 		printf("%ld\n", callstack[callstack_size]);
 	}
 }
+
+int env_var_size() {
+	return var_size;
+}
+
+struct Var* env_vars() {
+	return vars;
+}

@@ -19,4 +19,7 @@ void exit_scope();
 bool into_func(char* key);
 void exit_func();
 void env_dump();
+
+int env_var_size();
+struct Var* env_vars();
 #endif
