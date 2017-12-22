@@ -111,8 +111,10 @@ struct Node** reserve_nodes(struct Node** nodes, size_t *buf_size) {
 struct Node* parse(const char *str, size_t *idx) {
 	if (str[*idx] == EOF) return NULL;
 	else if (str[*idx] == '(') {
-		struct Node* node = gc_alloc();
-		node->tag = Nil;
+		//要素を最後の要素のcdrに代入していく
+		//最初の要素は使わないので静的に確保していい
+		struct Node dummy_root;
+		struct Node* tail = &dummy_root;
 		for (*idx = *idx+1;;) {
 			//reduce動作
 			if (str[*idx] == ')') {
@@ -131,12 +133,36 @@ struct Node* parse(const char *str, size_t *idx) {
 				if (car == NULL) return NULL;
 				struct Node* sexp = gc_alloc();
 				sexp->sexp.car = car;
-				sexp->sexp.cdr = node;
 				sexp->tag = Sexp;
-				node = sexp;
+				tail->sexp.cdr = sexp;
+				tail = sexp;
+				/*
+				(1 2 3)を2までパースした時の状況
+				 (???, cdr) : dummy_root
+				        ↓
+				      (1, cdr) : tail
+				         　　↓
+				           (2, NULL) <- assign
+				*/
 			}
 		}
-		return node;
+		//リスト末尾にnilを入れる
+		struct Node* nil = gc_alloc();
+		nil->tag = Nil;
+		tail->sexp.cdr = nil;
+		/*
+		(1 2 3)をパースし終えた状態
+		 (???, cdr) : dummy_root
+		        ↓
+		     (1, cdr) : dummy_root.cdr
+		      　　↓
+		       (2, cdr)
+		            ↓
+		         (3, cdr) : tail
+		               ↓
+		              nil
+		*/
+		return dummy_root.sexp.cdr;
 	}
 	else if (str[*idx] == '"') return parse_str(str, idx);
 	else if (is_digit(str[*idx])) return parse_num(str, idx);
