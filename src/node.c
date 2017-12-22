@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-uint32_t sexp_len(struct Node sexp) {
-	if (sexp.tag != Sexp) return 0;
-	return 1 + sexp_len(*sexp.sexp.cdr);
+uint32_t pair_len(struct Node pair) {
+	if (pair.tag != Pair) return 0;
+	return 1 + pair_len(*pair.pair.cdr);
 }
 
 char* pp(struct Node node) {
@@ -47,9 +47,9 @@ char* pp(struct Node node) {
 			sprintf(buf, "\"%s\"", node.str);
 			return buf;
 		}
-	case Sexp: {
-			char* car_str = pp(*node.sexp.car);
-			char* cdr_str = pp(*node.sexp.cdr);
+	case Pair: {
+			char* car_str = pp(*node.pair.car);
+			char* cdr_str = pp(*node.pair.cdr);
 			int len = 1 + strlen(car_str) + 1 + strlen(cdr_str) + 1;
 			char *buf = malloc(sizeof(char) * len);
 			sprintf(buf, "(%s %s)", car_str, cdr_str);

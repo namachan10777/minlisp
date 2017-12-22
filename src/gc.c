@@ -27,9 +27,9 @@ struct Node* gc_alloc() {
 //internal function
 void mark_rec(struct Node* node) {
 	node->visited = true;
-	if (node->tag == Sexp) {
-		mark_rec(node->sexp.car);
-		mark_rec(node->sexp.cdr);
+	if (node->tag == Pair) {
+		mark_rec(node->pair.car);
+		mark_rec(node->pair.cdr);
 	}
 }
 

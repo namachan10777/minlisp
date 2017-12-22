@@ -131,11 +131,11 @@ struct Node* parse(const char *str, size_t *idx) {
 			else {
 				struct Node* car = parse(str, idx);
 				if (car == NULL) return NULL;
-				struct Node* sexp = gc_alloc();
-				sexp->sexp.car = car;
-				sexp->tag = Sexp;
-				tail->sexp.cdr = sexp;
-				tail = sexp;
+				struct Node* pair = gc_alloc();
+				pair->pair.car = car;
+				pair->tag = Pair;
+				tail->pair.cdr = pair;
+				tail = pair;
 				/*
 				(1 2 3)を2までパースした時の状況
 				 (???, cdr) : dummy_root
@@ -149,7 +149,7 @@ struct Node* parse(const char *str, size_t *idx) {
 		//リスト末尾にnilを入れる
 		struct Node* nil = gc_alloc();
 		nil->tag = Nil;
-		tail->sexp.cdr = nil;
+		tail->pair.cdr = nil;
 		/*
 		(1 2 3)をパースし終えた状態
 		 (???, cdr) : dummy_root
@@ -162,7 +162,7 @@ struct Node* parse(const char *str, size_t *idx) {
 		               ↓
 		              nil
 		*/
-		return dummy_root.sexp.cdr;
+		return dummy_root.pair.cdr;
 	}
 	else if (str[*idx] == '"') return parse_str(str, idx);
 	else if (is_digit(str[*idx])) return parse_num(str, idx);

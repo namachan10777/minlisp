@@ -9,12 +9,12 @@ enum Tag {
 	Num,
 	Str,
 	Symbol,
-	Sexp
+	Pair
 };
 
 struct Node;
 
-struct Sexp{
+struct Pair{
 	struct Node* car;
 	struct Node* cdr;
 };
@@ -27,7 +27,7 @@ struct Node {
 		double num;
 		char* str;
 		char* symbol;
-		struct Sexp sexp;
+		struct Pair pair;
 	};
 };
 
