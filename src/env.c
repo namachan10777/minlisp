@@ -5,14 +5,6 @@
 #include "node.h"
 #include "macro.h"
 
-struct Var{
-	char* key;
-	struct Node* node;
-	//関数が呼ばれたら++call, 抜けると--calll
-	//ネストが作られたら++nest, 抜けると--nest
-	uint32_t call, nest;
-};
-
 struct Var* vars;
 uint32_t var_reserved_size = 256;
 uint32_t var_size = 0;
