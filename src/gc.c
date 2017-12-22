@@ -13,14 +13,12 @@ uint64_t reserved_size = 1024;
 struct Node **heap;
 
 void gc_init() {
-	heap = (struct Node**)malloc(sizeof(struct Node*) * reserved_size);
+	INIT(struct Node*, heap, reserved_size);
 }
 
 struct Node* gc_alloc() {
-	if (node_num + 1 > reserved_size)
-		RESERVE(struct Node*, heap, reserved_size);
 	struct Node *node = (struct Node*)malloc(sizeof(struct Node));
-	heap[node_num++] = node;
+	APPEND(struct Node*, heap, reserved_size, node_num, node);
 	return node;
 }
 

@@ -31,8 +31,8 @@ int64_t find_idx (char* key) {
 
 // exernal functions
 void env_init() {
-	vars = malloc(sizeof(struct Node*) * var_reserved_size);
-	callstack = malloc(sizeof(uint32_t*) * callstack_size);
+	INIT(struct Var, vars, var_reserved_size);
+	INIT(size_t, callstack, callstack_reserved_size);
 }
 
 void into_scope() {
@@ -53,9 +53,7 @@ bool into_func(char* key) {
 	int64_t fptr;
 	if ((fptr = find_idx(key)) < 0) 
 		return false;
-	if (callstack_size >= callstack_reserved_size)
-		RESERVE(uint32_t, callstack, callstack_reserved_size);
-	callstack[callstack_size++] = fptr;
+	APPEND(size_t, callstack, callstack_reserved_size, callstack_size, fptr);
 	++call_level;
 	return true;
 }
@@ -80,10 +78,8 @@ struct Node* find(char* key) {
 }
 
 void resist(char* key, struct Node* node) {
-	if (var_size >= var_reserved_size)
-		RESERVE(struct Var, vars, callstack_reserved_size);
 	struct Var var = {key, node, call_level, nest_level};
-	vars[var_size++] = var;
+	APPEND(struct Var, vars, callstack_reserved_size, callstack_size, var);
 }
 
 void env_dump() {
