@@ -11,7 +11,7 @@ all: build
 gc.o: gc.c node.h
 	$(COMPILER) -o gc.o -c gc.c -I.
 
-parser.o: parser.c parser.h gc.h
+parser.o: parser.c parser.h gc.h node.h
 	$(COMPILER) -o parser.o -c parser.c -I.
 
 main.o: main.c gc.h node.h parser.h
