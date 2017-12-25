@@ -15,7 +15,7 @@ enum Tag {
 	SForm
 };
 
-enum BultinFun {
+enum BuiltinFun {
 	Add,
 	Sub,
 	Mul,
@@ -57,7 +57,7 @@ struct Node {
 		char* symbol;
 		struct Pair pair;
 		struct Fun fun;
-		enum BultinFun bfun;
+		enum BuiltinFun bfun;
 		enum SpecialForm sform;
 	};
 };
