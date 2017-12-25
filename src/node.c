@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "util.h"
 
 uint32_t pair_len(struct Node pair) {
 	if (pair.tag != Pair) return 0;
@@ -69,26 +70,24 @@ char* pp(struct Node node) {
 		}
 	case BFun: {
 			switch (node.bfun) {
-				case Add :
-				case Sub :
-				case Mul :
-				case Div :
-				case Mod :
-				case Car :
-				case Cdr :
-				case Cons :
-				case List :
-					break;
+				case Add : return format("+");
+				case Sub : return format("-");
+				case Mul : return format("*");
+				case Div : return format("/");
+				case Mod : return format("%");
+				case Car : return format("car");
+				case Cdr : return format("cdr");
+				case Cons : return format("cons");
+				case List : return format("list");
 			}
 		}
 	case SForm: {
 			switch (node.sform) {
-				case If :
-				case Let :
-				case Quote :
-				case Defun :
-				case Lambda :
-					break;
+				case If : return format("if");
+				case Let : return format("let");
+				case Quote : return format("quote");
+				case Defun : return format("defun");
+				case Lambda : return format("lambda");
 			}
 		}
 	}
