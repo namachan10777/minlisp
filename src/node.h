@@ -9,7 +9,30 @@ enum Tag {
 	Num,
 	Str,
 	Symbol,
-	Pair
+	Pair,
+	Fun,
+	BFun,
+	SForm
+};
+
+enum BultinFun {
+	Add,
+	Sub,
+	Mul,
+	Div,
+	Mod,
+	Cons,
+	Cdr,
+	Car,
+	List
+};
+
+enum SpecialForm {
+	If,
+	Let,
+	Quote,
+	Defun,
+	Lambda
 };
 
 struct Node;
@@ -17,6 +40,11 @@ struct Node;
 struct Pair{
 	struct Node* car;
 	struct Node* cdr;
+};
+
+struct Fun {
+	struct Node* args;
+	struct Node* body;
 };
 
 struct Node {
@@ -28,6 +56,9 @@ struct Node {
 		char* str;
 		char* symbol;
 		struct Pair pair;
+		struct Fun fun;
+		enum BultinFun bfun;
+		enum SpecialForm sform;
 	};
 };
 

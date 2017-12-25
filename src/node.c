@@ -57,6 +57,40 @@ char* pp(struct Node node) {
 			free(car_str);
 			return buf;
 		}
+	case Fun: {
+			char* car_str = pp(*node.pair.car);
+			char* cdr_str = pp(*node.pair.cdr);
+			int len = 1 + 7 + strlen(car_str) + 1 + strlen(cdr_str) + 1;
+			char *buf = malloc(sizeof(char) * len);
+			sprintf(buf, "(lambda %s %s)", car_str, cdr_str);
+			free(cdr_str);
+			free(car_str);
+			return buf;		
+		}
+	case BFun: {
+			switch (node.bfun) {
+				case Add :
+				case Sub :
+				case Mul :
+				case Div :
+				case Mod :
+				case Car :
+				case Cdr :
+				case Cons :
+				case List :
+					break;
+			}
+		}
+	case SForm: {
+			switch (node.sform) {
+				case If :
+				case Let :
+				case Quote :
+				case Defun :
+				case Lambda :
+					break;
+			}
+		}
 	}
 	return NULL;
 }
