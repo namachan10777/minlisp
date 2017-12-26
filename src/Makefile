@@ -8,6 +8,9 @@ COMPILER := $(CC) $(CFLAGS)
 
 all: build
 
+util.o: util.c util.h
+	$(COMPILER) -o util.o -c util.c -I.
+
 gc.o: gc.c node.h macro.h
 	$(COMPILER) -o gc.o -c gc.c -I.
 
