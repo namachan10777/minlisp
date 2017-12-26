@@ -20,7 +20,7 @@ parser.o: parser.c parser.h gc.h node.h  macro.h
 main.o: main.c gc.h node.h parser.h
 	$(COMPILER) -o main.o -c main.c -I.
 
-node.o: node.c node.h
+node.o: node.c node.h util.h
 	$(COMPILER) -o node.o -c node.c -I.
 
 env.o: env.c env.h gc.h node.h macro.h
