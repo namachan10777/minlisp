@@ -65,4 +65,12 @@ struct Node {
 char* pp (struct Node node);
 uint32_t sexp_len(struct Node sexp);
 
+struct Node* alloc_nil();
+struct Node* alloc_num(float num);
+struct Node* alloc_symbol(char* symbol);
+struct Node* alloc_str(char* str);
+struct Node* alloc_pair(struct Node* car, struct Node* cdr);
+struct Node* alloc_fun(struct Node* args, struct Node* body);
+struct Node* alloc_bfun(enum BuiltinFun);
+struct Node* alloc_sform(enum SpecialForm);
 #endif

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "util.h"
+#include "gc.h"
 
 uint32_t pair_len(struct Node pair) {
 	if (pair.tag != Pair) return 0;
@@ -92,4 +93,54 @@ char* pp(struct Node node) {
 		}
 	}
 	return NULL;
+}
+
+struct Node* alloc_nil() {
+	struct Node* node = gc_alloc();
+	node->tag = Nil;
+	return node;
+}
+struct Node* alloc_num(float num) {
+	struct Node* node = gc_alloc();
+	node->tag = Num;
+	node->num = num;
+	return node;
+}
+struct Node* alloc_symbol(char* symbol) {
+	struct Node* node = gc_alloc();
+	node->tag = Symbol;
+	node->symbol = symbol;
+	return node;
+}
+struct Node* alloc_str(char* str) {
+	struct Node* node = gc_alloc();
+	node->tag = Str;
+	node->str = str;
+	return node;
+}
+struct Node* alloc_pair(struct Node* car, struct Node* cdr) {
+	struct Node* node = gc_alloc();
+	node->tag = Pair;
+	node->pair.car = car;
+	node->pair.cdr = cdr;
+	return node;
+}
+struct Node* alloc_fun(struct Node* args, struct Node* body) {
+	struct Node* node = gc_alloc();
+	node->tag = Fun;
+	node->fun.args = args;
+	node->fun.body = body;
+	return node;
+}
+struct Node* alloc_bfun(enum BuiltinFun bfun) {
+	struct Node* node = gc_alloc();
+	node->tag = BFun;
+	node->bfun = bfun;
+	return node;
+}
+struct Node* alloc_sform(enum SpecialForm sform) {
+	struct Node* node = gc_alloc();
+	node->tag = SForm;
+	node->sform = sform;
+	return node;
 }
