@@ -52,13 +52,8 @@ struct Node* parse_num(const char *str, size_t *idx) {
 		end = *idx + 1;
 	}
 	char* slice = str_slice(buf, str, start, end);
-	float f = atof(slice);
-	struct Node* node = gc_alloc();
 
-	node->tag = Num;
-	node->num = f;
-
-	return node;
+	return alloc_num(atof(slice));
 }
 
 struct Node* parse_symbol(const char *str, size_t *idx) {
@@ -68,16 +63,11 @@ struct Node* parse_symbol(const char *str, size_t *idx) {
 	}
 	char* buf = malloc(sizeof(struct Node*) * (end - start + 1));
 	char* slice = str_slice(buf, str, start, end); 
-	struct Node* node = gc_alloc();
 
-	if (strcmp(slice, "nil")) {
-		node->tag = Symbol;
-		node->symbol = slice;
-	}
-	else {
-		node->tag = Nil;
-	}
-	return node;
+	if (strcmp(slice, "nil") == 0)
+		return alloc_nil();
+	else
+		return alloc_symbol(slice);
 }
 
 struct Node* parse_str(const char *str, size_t *idx) {
@@ -92,12 +82,7 @@ struct Node* parse_str(const char *str, size_t *idx) {
 	}
 	char* buf = malloc(sizeof(char) * (end - start - 1));
 	char* slice = str_slice(buf, str, start+1, end-1);
-	struct Node* node = gc_alloc();
-
-	node->tag = Str;
-	node->str = slice;
-
-	return node;
+	return alloc_str(slice);
 }
 
 struct Node** reserve_nodes(struct Node** nodes, size_t *buf_size) {
@@ -147,23 +132,14 @@ struct Node* parse(const char *str, size_t *idx) {
 			return nodes[0];
 		}
 		else if (!is_pair) {
-			struct Node* node = gc_alloc();
-			node->tag = Nil;
+			struct Node* node = alloc_nil();
 			for (int64_t idx = nodes_size - 1; idx >= 0; --idx) {
-				struct Node* cell = gc_alloc();
-				cell->tag = Pair;
-				cell->pair.car = nodes[idx];
-				cell->pair.cdr = node;
-				node = cell;
+				node = alloc_pair(nodes[idx], node);
 			}
 			return node;
 		}
 		else if (is_pair && nodes_size == 2) {
-			struct Node* pair = gc_alloc();
-			pair->tag = Pair;
-			pair->pair.car = nodes[0];
-			pair->pair.cdr = nodes[1];
-			return pair;
+			return alloc_pair(nodes[0], nodes[1]);
 		}
 		else {
 			return NULL;
