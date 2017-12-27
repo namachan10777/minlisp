@@ -23,7 +23,7 @@ main.o: main.c gc.h node.h parser.h
 node.o: node.c node.h util.h
 	$(COMPILER) -o node.o -c node.c -I.
 
-env.o: env.c env.h gc.h node.h macro.h
+env.o: env.c env.h gc.h node.h macro.h util.h
 	$(COMPILER) -o env.o -c env.c -I.
 
 build: main.o gc.o parser.o node.o env.o

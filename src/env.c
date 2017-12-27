@@ -4,6 +4,7 @@
 #include "env.h"
 #include "node.h"
 #include "macro.h"
+#include "util.h"
 
 struct Var* vars;
 uint32_t var_reserved_size = 256;
@@ -33,6 +34,23 @@ int64_t find_idx (char* key) {
 void env_init() {
 	INIT(struct Var, vars, var_reserved_size);
 	INIT(size_t, callstack, callstack_reserved_size);
+
+	resist(format("+"), alloc_bfun(Add));
+	resist(format("-"), alloc_bfun(Sub));
+	resist(format("*"), alloc_bfun(Mul));
+	resist(format("/"), alloc_bfun(Div));
+	resist(format("%"), alloc_bfun(Mod));
+	resist(format("cons"), alloc_bfun(Cons));
+	resist(format("cdr"), alloc_bfun(Cdr));
+	resist(format("car"), alloc_bfun(Car));
+	resist(format("cons"), alloc_bfun(Cons));
+	resist(format("list"), alloc_bfun(List));
+
+	resist(format("if"), alloc_sform(If));
+	resist(format("let"), alloc_sform(Let));
+	resist(format("quote"), alloc_sform(Quote));
+	resist(format("defun"), alloc_sform(Defun));
+	resist(format("lambda"), alloc_sform(Lambda));
 }
 
 void into_scope() {
