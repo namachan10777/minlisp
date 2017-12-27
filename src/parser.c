@@ -5,14 +5,6 @@
 #include "node.h"
 #include "macro.h"
 
-char* reserve_str(char* str, size_t *buf_size) {
-	char* buf = malloc(sizeof(char) * *buf_size * 2);
-	for (size_t i = 0; i < *buf_size; ++i)
-		buf[i] = str[i];
-	free(str);
-	return buf;
-}
-
 char* str_slice(char* buf, const char* str, size_t start, size_t end) {
 	for (size_t from = start, to = 0; from < end; ++from, ++to) {
 		buf[to] = str[from];
@@ -23,17 +15,14 @@ char* str_slice(char* buf, const char* str, size_t start, size_t end) {
 
 char* read_all(FILE* fp) {
 	size_t buf_size = 256, length = 0;
-	char* buf = malloc(sizeof(char) * buf_size);
+	char* buf;
+	INIT(char, buf, buf_size);
 	char c;
 	while((c = fgetc(fp)) != EOF) {
 		//バッファから溢れる場合にはバッファを拡張する。
-		if (length >= buf_size)
-			buf = reserve_str(buf, &buf_size);	
-		buf[length++] = c;
+		APPEND(char, buf, buf_size, length, c);
 	}
-	if (length+1 >= buf_size)
-		buf = reserve_str(buf, &buf_size);
-	buf[length] = EOF;
+	APPEND(char, buf, buf_size, length, EOF);
 	return buf;
 }
 
