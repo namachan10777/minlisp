@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 enum Tag {
 	Bool,
@@ -79,7 +80,10 @@ struct Node* alloc_num(float num);
 struct Node* alloc_symbol(char* symbol);
 struct Node* alloc_str(char* str);
 struct Node* alloc_pair(struct Node* car, struct Node* cdr);
-struct Node* alloc_fun(struct Node* args, struct Node* body);
+struct Node* alloc_fun(char** args, size_t args_num, struct Node* body);
 struct Node* alloc_bfun(enum BuiltinFun);
 struct Node* alloc_sform(enum SpecialForm);
+
+#define ITER_REF(x, list) for (struct Node *__sexp__ = list, *x = list->pair.car; __sexp__->tag == Pair; __sexp__ = __sexp__->pair.cdr, x = __sexp__->pair.car)
+
 #endif
