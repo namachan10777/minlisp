@@ -20,6 +20,10 @@ void gc_init() {
 	INIT(struct Node*, heap, reserved_size);
 }
 
+void gc_quit() {
+	free(heap);
+}
+
 struct Node* gc_alloc() {
 	struct Node *node = (struct Node*)malloc(sizeof(struct Node));
 	APPEND(struct Node*, heap, reserved_size, node_num, node);

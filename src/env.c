@@ -5,6 +5,7 @@
 #include "node.h"
 #include "macro.h"
 #include "util.h"
+#include "gc.h"
 
 struct Var* vars;
 uint32_t var_reserved_size = 256;
@@ -54,6 +55,15 @@ void env_init() {
 	resist("quote", alloc_sform(Quote));
 	resist("defun", alloc_sform(Defun));
 	resist("lambda", alloc_sform(Lambda));
+}
+
+void env_quit() {
+	for (size_t i = 0; i < var_size; ++i) {
+		free(vars[i].key);
+		gc_free(vars[i].node);
+	}
+	free(callstack);
+	free(vars);
 }
 
 void into_scope() {
