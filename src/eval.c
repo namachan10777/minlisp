@@ -203,7 +203,9 @@ struct Node* eval_let(char* symbol, struct Node* def, struct Node* exp) {
 	into_scope();
 	resist(symbol, eval(def));
 	fprintf(stderr, "eval let\n");
-	return eval(exp);
+	struct Node* result = eval(exp);
+	exit_scope();
+	return result;
 }
 
 //引数の型チェック
@@ -254,7 +256,9 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	for (size_t i = 0; i < fun->fun.arg_num; ++i) {
 		resist(fun->fun.args[i], idx(args, i));
 	}
-	return eval(fun->fun.body);
+	struct Node* result = eval(fun->fun.body);
+	exit_func();
+	return result;
 }
 
 struct Node* eval_bfun(enum BuiltinFun bfun, struct Node* args) {
