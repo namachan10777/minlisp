@@ -32,12 +32,12 @@ char* pp(struct Node node) {
 	case Num: {
 			int len;
 			// 桁数計算
-			if (node.num < 1.0f)
-				len = ceilf(log10f(node.num));
+			if (node.num > 1.0f)
+				len = (int)ceilf(log10f(abs(node.num) + 0.1f));
 			else
-				len = 0;
+				len = 1;
 			// 符号が負の場合は一文字増える
-			if (node.num < 0) ++len;
+			if (node.num < 0.0f) ++len;
 			// '.' +  "xxx" '\0'
 			len += 4;
 			char *buf = malloc(sizeof(char) * len);
