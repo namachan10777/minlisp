@@ -2,6 +2,7 @@
 #include "node.h"
 #include "env.h"
 #include "util.h"
+#include "gc.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -320,6 +321,7 @@ struct Node* eval_sform(enum SpecialForm sform, struct Node* args) {
 }
 
 struct Node* eval (struct Node* node) {
+	gc_collect();
 	switch (node->tag) {
 	//nil, 数値, 文字列, 関数, 特殊形式は評価されてもそのまま
 	case Nil:

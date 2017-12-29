@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
 	struct Node* node = start_parse(argv[1]);
 	if (node == NULL) return -1;
 	struct Node* result = eval(node);
+	gc_collect();
 	if (result == NULL) return -1;
 	char* str = pp(*result);
 	printf("%s\n", str);
