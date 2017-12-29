@@ -67,11 +67,8 @@ void exit_scope() {
 	--nest_level;
 }
 
-bool into_func(char* key) {
-	int64_t fptr;
-	if ((fptr = find_idx(key)) < 0) 
-		return false;
-	APPEND(size_t, callstack, callstack_reserved_size, callstack_size, fptr);
+bool into_func(uint32_t pos) {
+	APPEND(size_t, callstack, callstack_reserved_size, callstack_size, pos);
 	++call_level;
 	return true;
 }
@@ -95,9 +92,14 @@ struct Node* find(char* key) {
 	return vars[idx].node;
 }
 
-void resist(char* key, struct Node* node) {
+uint32_t resist(char* key, struct Node* node) {
 	struct Var var = {key, node, call_level, nest_level};
-	APPEND(struct Var, vars, callstack_reserved_size, callstack_size, var);
+	APPEND(struct Var, vars, var_reserved_size, var_size, var);
+	return var_size - 1;
+}
+
+uint32_t current_fptr() {
+	return var_size;
 }
 
 void env_dump() {

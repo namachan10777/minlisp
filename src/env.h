@@ -13,10 +13,11 @@ struct Var{
 
 void env_init();
 struct Node* find(char* key);
-void resist(char* key, struct Node* node);
+uint32_t resist(char* key, struct Node* node);
+uint32_t current_fptr();
 void into_scope();
 void exit_scope();
-bool into_func(char* key);
+bool into_func(uint32_t pos);
 void exit_func();
 void env_dump();
 
