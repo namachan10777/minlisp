@@ -53,8 +53,10 @@ struct Node* parse_symbol(const char *str, size_t *idx) {
 	char* buf = malloc(sizeof(struct Node*) * (end - start + 1));
 	char* slice = str_slice(buf, str, start, end); 
 
-	if (strcmp(slice, "nil") == 0)
+	if (strcmp(slice, "nil") == 0) {
+		free(buf);
 		return alloc_nil();
+	}
 	else if (strcmp(slice, "true") == 0) {
 		free(buf);
 		return alloc_bool(true);
