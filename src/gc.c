@@ -7,6 +7,10 @@
 #include "env.h"
 //ノードの数
 uint64_t node_num = 0;
+//GCを呼ばれたけども実行しなかったもののカウント。実行するとリセットする。
+uint64_t call_cnt = 0;
+//32回呼ばれるごとにGCを実行
+const uint64_t call_cnt_thresh = 32;
 //現在確保されてるノード格納スペースの大きさ
 uint64_t reserved_size = 1024;
 //ノード格納スペースへのポインタ
@@ -20,6 +24,39 @@ struct Node* gc_alloc() {
 	struct Node *node = (struct Node*)malloc(sizeof(struct Node));
 	APPEND(struct Node*, heap, reserved_size, node_num, node);
 	return node;
+}
+
+void gc_free(struct Node* node) {
+	if (node != NULL) {
+		switch (node->tag) {
+		case Nil:
+		case Bool:
+		case Num:
+		case Pair:
+		case BFun: 
+		case SForm: {
+				free(node);
+				break;
+			}
+		case Str: {
+				free(node->str);
+				free(node);
+				break;
+			}
+		case Symbol: {
+				free(node->symbol);
+				free(node);
+				break;
+			}
+		case Fun: {
+				for (size_t i = 0; i < node->fun.arg_num; ++i) {
+					free(node->fun.args[i]);
+				}
+				free(node);
+				break;
+			}
+		}
+	}
 }
 
 //internal function
@@ -46,7 +83,7 @@ void sweep() {
 			heap[i]->visited = false;
 		}
 		else {
-			free(heap[i]);
+			gc_free(heap[i]);
 			heap[i] = NULL;
 		}
 	}
@@ -67,7 +104,12 @@ void compaction() {
 }
 
 void gc_collect() {
-	mark();
-	sweep();
-	compaction();
+	if (call_cnt < call_cnt_thresh) {
+		++call_cnt;
+	}
+	else {
+		mark();
+		sweep();
+		compaction();
+	}
 }
