@@ -74,14 +74,23 @@ char* pp(struct Node node) {
 			return buf;
 		}
 	case Fun: {
-			char* car_str = pp(*node.pair.car);
-			char* cdr_str = pp(*node.pair.cdr);
-			int len = 1 + 7 + strlen(car_str) + 1 + strlen(cdr_str) + 1;
-			char *buf = malloc(sizeof(char) * len);
-			sprintf(buf, "(lambda %s %s)", car_str, cdr_str);
-			free(cdr_str);
-			free(car_str);
-			return buf;		
+			int arg_str_length = 0;
+			for (size_t i = 0; i < node.fun.arg_num; ++i) {
+				arg_str_length += strlen(node.fun.args[i]) + 1;
+			}
+			--arg_str_length;
+			char* body_str = pp(*node.fun.body);
+			int len = 6 + 1 + arg_str_length + 1 + strlen(body_str);
+			char* buf = malloc(sizeof(char) * len);
+			sprintf(buf, "(lambda ");
+			for(size_t i = 0; i < node.fun.arg_num; ++i) {
+				strcat(buf, node.fun.args[i]);
+				strcat(buf, " ");	
+			}
+			strcat(buf, body_str);
+			strcat(buf, ")");
+			free(body_str);
+			return buf;	
 		}
 	case BFun: {
 			switch (node.bfun) {
@@ -148,11 +157,13 @@ struct Node* alloc_pair(struct Node* car, struct Node* cdr) {
 	node->pair.cdr = cdr;
 	return node;
 }
-struct Node* alloc_fun(struct Node* args, struct Node* body) {
+struct Node* alloc_fun(char** args, size_t arg_num, struct Node* body) {
 	struct Node* node = gc_alloc();
 	node->tag = Fun;
 	node->fun.args = args;
+	node->fun.arg_num = arg_num;
 	node->fun.body = body;
+	node->fun.pos = current_fptr();
 	return node;
 }
 struct Node* alloc_bfun(enum BuiltinFun bfun) {

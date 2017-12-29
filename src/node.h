@@ -47,8 +47,10 @@ struct Pair{
 };
 
 struct Fun {
-	struct Node* args;
+	char** args;
+	size_t arg_num;
 	struct Node* body;
+	uint32_t pos;
 };
 
 struct Node {
