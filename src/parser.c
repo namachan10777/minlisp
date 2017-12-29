@@ -9,7 +9,7 @@ char* str_slice(char* buf, const char* str, size_t start, size_t end) {
 	for (size_t from = start, to = 0; from < end; ++from, ++to) {
 		buf[to] = str[from];
 	}
-	buf[end] = '\0';
+	buf[end-start] = '\0';
 	return buf;
 }
 
@@ -55,6 +55,14 @@ struct Node* parse_symbol(const char *str, size_t *idx) {
 
 	if (strcmp(slice, "nil") == 0)
 		return alloc_nil();
+	else if (strcmp(slice, "true") == 0) {
+		free(buf);
+		return alloc_bool(true);
+	}
+	else if (strcmp(slice, "false") == 0) {
+		free(buf);
+		return alloc_bool(false);
+	}
 	else
 		return alloc_symbol(slice);
 }

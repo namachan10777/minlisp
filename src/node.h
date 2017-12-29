@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 enum Tag {
+	Bool,
 	Nil,
 	Num,
 	Str,
@@ -21,6 +22,9 @@ enum BuiltinFun {
 	Mul,
 	Div,
 	Mod,
+	Not,
+	And,
+	Or,
 	Cons,
 	Cdr,
 	Car,
@@ -52,6 +56,7 @@ struct Node {
 	bool visited;
 	enum Tag tag;
 	union {
+		bool boolean;
 		double num;
 		char* str;
 		char* symbol;
@@ -66,6 +71,7 @@ char* pp (struct Node node);
 uint32_t sexp_len(struct Node sexp);
 
 struct Node* alloc_nil();
+struct Node* alloc_bool(bool boolean);
 struct Node* alloc_num(float num);
 struct Node* alloc_symbol(char* symbol);
 struct Node* alloc_str(char* str);

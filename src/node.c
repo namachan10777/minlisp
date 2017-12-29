@@ -35,6 +35,10 @@ char* pp(struct Node node) {
 			sprintf(buf, "%.3f", node.num);
 			return buf;
 		}
+	case Bool: {
+		if (node.boolean) return format("true");
+		else return format("false");
+	}
 	case Symbol: {
 			// sym + '\0'
 			int len = strlen(node.symbol) + 1;
@@ -76,6 +80,9 @@ char* pp(struct Node node) {
 				case Mul : return format("*");
 				case Div : return format("/");
 				case Mod : return format("%");
+				case Not : return format("not");
+				case And : return format("and");
+				case Or : return format("or");
 				case Car : return format("car");
 				case Cdr : return format("cdr");
 				case Cons : return format("cons");
@@ -98,6 +105,12 @@ char* pp(struct Node node) {
 struct Node* alloc_nil() {
 	struct Node* node = gc_alloc();
 	node->tag = Nil;
+	return node;
+}
+struct Node* alloc_bool(bool boolean) {
+	struct Node* node = gc_alloc();
+	node->tag = Bool;
+	node->boolean = boolean;
 	return node;
 }
 struct Node* alloc_num(float num) {

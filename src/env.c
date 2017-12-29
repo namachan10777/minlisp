@@ -40,6 +40,9 @@ void env_init() {
 	resist(format("*"), alloc_bfun(Mul));
 	resist(format("/"), alloc_bfun(Div));
 	resist(format("%"), alloc_bfun(Mod));
+	resist(format("not"), alloc_bfun(Not));
+	resist(format("and"), alloc_bfun(And));
+	resist(format("or"), alloc_bfun(Or));
 	resist(format("cons"), alloc_bfun(Cons));
 	resist(format("cdr"), alloc_bfun(Cdr));
 	resist(format("car"), alloc_bfun(Car));
