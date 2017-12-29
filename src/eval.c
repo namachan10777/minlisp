@@ -294,7 +294,6 @@ struct Node* eval_if(struct Node* cond, struct Node* sexp1, struct Node* sexp2) 
 struct Node* eval_let(char* symbol, struct Node* def, struct Node* exp) {
 	into_scope();
 	resist(symbol, eval(def));
-	fprintf(stderr, "eval let\n");
 	struct Node* result = eval(exp);
 	exit_scope();
 	return result;
@@ -335,7 +334,6 @@ struct Node* eval_defun(char* symbol, struct Node* args, struct Node* body, stru
 }
 
 struct Node* eval_fun(struct Node* fun, struct Node* args) {
-	fprintf(stderr, "app\n");
 	if (fun->tag != Fun) {
 		fprintf(stderr, "関数ではないです\n");
 		return NULL;
