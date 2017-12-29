@@ -353,6 +353,15 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	return result;
 }
 
+struct Node* eval_print(struct Node* arg) {
+	if (sexp_len(*arg) != 1) {
+		fprintf(stderr, "printの引数は一つだけです\n");
+		return NULL;
+	}
+	puts(pp(*eval(arg->pair.car)));
+	return alloc_nil();
+}
+
 struct Node* eval_bfun(enum BuiltinFun bfun, struct Node* args) {
 	switch(bfun) {
 	case Add: return eval_add(args);
@@ -370,6 +379,7 @@ struct Node* eval_bfun(enum BuiltinFun bfun, struct Node* args) {
 	case Cdr: return eval_cdr(args);
 	case Cons: return eval_cons(args);
 	case List: return eval_list(args);
+	case Print: return eval_print(args);
 	}
 	return NULL;
 }

@@ -32,7 +32,8 @@ enum BuiltinFun {
 	Cons,
 	Cdr,
 	Car,
-	List
+	List,
+	Print
 };
 
 enum SpecialForm {
