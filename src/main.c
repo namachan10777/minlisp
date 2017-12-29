@@ -3,6 +3,7 @@
 #include <node.h>
 #include <parser.h>
 #include <env.h>
+#include "eval.h"
 
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
@@ -12,7 +13,10 @@ int main(int argc, char *argv[]) {
 	gc_init();
 	env_init();
 	struct Node* node = start_parse(argv[1]);
-	char* str = pp(*node);
+	if (node == NULL) return -1;
+	struct Node* result = eval(node);
+	if (result == NULL) return -1;
+	char* str = pp(*result);
 	printf("%s\n", str);
 	printf("ファイル名 : %s", argv[1]);
 }
