@@ -5,8 +5,17 @@
 #include "gc.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
+
+struct Node* deref(char* key) {
+	struct Node *node = find(key);
+	if (node == NULL) {
+		fprintf (stderr, "%s : 未定義の変数です\n", key);
+	}
+	return node;
+}
 
 //組み込み関数
 struct Node* eval_add(struct Node* args) {
@@ -149,6 +158,89 @@ struct Node* eval_or(struct Node* args) {
 	return alloc_bool(acc);
 }
 
+struct Node* eval_gret(struct Node* args) {
+	if (sexp_len(*args) < 2) {
+		fprintf(stderr, "<には引数が2つ以上必要です\n");
+		return NULL;
+	}
+	struct Node* left = eval(args->pair.car);
+	if (left->tag != Num) {
+		fprintf(stderr, "大小関係を比較できるのは数値だけです\n");
+		return NULL;
+	}
+	ITER_REF(right, args->pair.cdr) {
+		right = eval(right);
+		if (right->tag != Num) {
+			fprintf(stderr, "大小関係を比較できるのは数値だけです\n");
+			return NULL;
+		}
+		if (left->num >= right->num) {
+			return alloc_bool(false);
+		}
+	}
+	return alloc_bool(true);
+}
+
+struct Node* eval_less(struct Node* args) {
+	if (sexp_len(*args) < 2) {
+		fprintf(stderr, ">には引数が2つ以上必要です\n");
+		return NULL;
+	}
+	struct Node* left = eval(args->pair.car);
+	if (left->tag != Num) {
+		fprintf(stderr, "大小関係を比較できるのは数値だけです\n");
+		return NULL;
+	}
+	ITER_REF(right, args->pair.cdr) {
+		right = eval(right);
+		if (right->tag != Num) {
+			fprintf(stderr, "大小関係を比較できるのは数値だけです\n");
+			return NULL;
+		}
+		if (left->num <= right->num) {
+			return alloc_bool(false);
+		}
+		left = right;
+	}
+	return alloc_bool(true);
+}
+
+bool eq(struct Node* left, struct Node* right) {
+	if (right->tag != left->tag) return false;
+	switch(left->tag) {
+	case Nil: return true;
+	case Bool: return left->boolean == right->boolean;
+	case Num: return left->num == right->num;
+	case Str: return strcmp(left->str, right->str);
+	case Symbol: return false;
+	case Pair: {
+			return eq(right->pair.car, left->pair.car) && eq(right->pair.cdr, left->pair.cdr);
+		}
+	case SForm: {
+			return left->sform == Quote && right->sform == Quote;
+		}
+	case BFun:
+	case Fun: {
+			return false;
+		}
+	}
+	return false;
+}
+
+struct Node* eval_eq(struct Node* args) {
+	if (sexp_len(*args) < 2) {
+		fprintf(stderr, "=には引数が2つ以上必要です\n");
+		return NULL;
+	}
+	struct Node* left = eval(args->pair.car);
+	bool acc = true;
+	ITER_REF(right, args->pair.cdr) {
+		right = eval(right);
+		acc &= eq(left, right);
+	}
+	return alloc_bool(acc);
+}
+
 struct Node* eval_car(struct Node* arg) {
 	if (arg->tag != Pair) {
 		fprintf(stderr, "ドット対以外にはcarを適用できません\n");
@@ -271,6 +363,9 @@ struct Node* eval_bfun(enum BuiltinFun bfun, struct Node* args) {
 	case Not: return eval_not(args);
 	case And: return eval_and(args);
 	case Or: return eval_or(args);
+	case Gret: return eval_gret(args);
+	case Less: return eval_less(args);
+	case Eq: return eval_eq(args);
 	case Car: return eval_car(args);
 	case Cdr: return eval_cdr(args);
 	case Cons: return eval_cons(args);
@@ -338,12 +433,7 @@ struct Node* eval (struct Node* node) {
 			return node;
 		}
 	case Symbol: {
-			struct Node* instance = find(node->symbol);
-			if (instance == NULL) {
-				fprintf(stderr, "%s : 未定義の変数です\n", node->pair.car->symbol);
-				return NULL;
-			}
-			return instance;
+			return deref(node->symbol);
 		}
 	case Pair: {
 			struct Node* fun = eval(node->pair.car);

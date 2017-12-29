@@ -49,6 +49,9 @@ void env_init() {
 	resist("car", alloc_bfun(Car));
 	resist("cons", alloc_bfun(Cons));
 	resist("list", alloc_bfun(List));
+	resist("<", alloc_bfun(Gret));
+	resist(">", alloc_bfun(Less));
+	resist("=", alloc_bfun(Eq));
 
 	resist("if", alloc_sform(If));
 	resist("let", alloc_sform(Let));

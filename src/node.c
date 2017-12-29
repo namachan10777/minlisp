@@ -102,6 +102,9 @@ char* pp(struct Node node) {
 				case Not : return format("not");
 				case And : return format("and");
 				case Or : return format("or");
+				case Gret: return format("<");
+				case Less: return format(">");
+				case Eq: return format("=");
 				case Car : return format("car");
 				case Cdr : return format("cdr");
 				case Cons : return format("cons");
