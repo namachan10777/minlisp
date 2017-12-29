@@ -72,8 +72,11 @@ void into_scope() {
 
 void exit_scope() {
 	for (int64_t i = var_size - 1; i >= 0; --i) {
-		if (vars[i].nest >= nest_level && vars[i].call == call_level)
+		if (vars[i].nest >= nest_level && vars[i].call == call_level) {
+			//変数はGCの管理対象外なので参照しなくなった時点で消す
+			free(vars[i].key);
 			--var_size;
+		}
 		else
 			break;
 	}
