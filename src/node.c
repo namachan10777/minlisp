@@ -5,6 +5,7 @@
 #include <string.h>
 #include "util.h"
 #include "gc.h"
+#include "env.h"
 
 uint32_t sexp_len(struct Node pair) {
 	if (pair.tag != Pair) return 0;
