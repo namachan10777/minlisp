@@ -9,6 +9,13 @@
 uint32_t pair_len(struct Node pair) {
 	if (pair.tag != Pair) return 0;
 	return 1 + pair_len(*pair.pair.cdr);
+struct Node* idx(struct Node* list, size_t idx) {
+	size_t i = 0;
+	ITER_REF(node, list) {
+		if (idx == i++)
+			return node;
+	}
+	return NULL;
 }
 
 char* pp(struct Node node) {

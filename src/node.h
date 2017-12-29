@@ -69,6 +69,7 @@ struct Node {
 
 char* pp (struct Node node);
 uint32_t sexp_len(struct Node sexp);
+struct Node* idx(struct Node* nodes, size_t idx);
 
 struct Node* alloc_nil();
 struct Node* alloc_bool(bool boolean);
