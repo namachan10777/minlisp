@@ -6,9 +6,11 @@
 #include "util.h"
 #include "gc.h"
 
-uint32_t pair_len(struct Node pair) {
+uint32_t sexp_len(struct Node pair) {
 	if (pair.tag != Pair) return 0;
-	return 1 + pair_len(*pair.pair.cdr);
+	return 1 + sexp_len(*pair.pair.cdr);
+}
+
 struct Node* idx(struct Node* list, size_t idx) {
 	size_t i = 0;
 	ITER_REF(node, list) {
