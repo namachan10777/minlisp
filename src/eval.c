@@ -344,7 +344,7 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	}
 	into_func(fun->fun.pos);
 	for (size_t i = 0; i < fun->fun.arg_num; ++i) {
-		resist(fun->fun.args[i], idx(args, i));
+		resist(fun->fun.args[i], eval(idx(args, i)));
 	}
 	struct Node* result = eval(fun->fun.body);
 	exit_func();
