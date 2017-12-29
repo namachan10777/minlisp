@@ -1,6 +1,7 @@
 #include "eval.h"
 #include "node.h"
 #include "env.h"
+#include "util.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -223,7 +224,7 @@ struct Node* eval_lambda(struct Node* args, struct Node* body) {
 				fprintf(stderr, "仮引数が不正です\n");
 				return NULL;
 			}
-			fun_args[i++] = arg->symbol;
+			fun_args[i++] = deep_copy(arg->symbol);
 		}
 		return alloc_fun(fun_args, fun_arg_num, body);
 	}

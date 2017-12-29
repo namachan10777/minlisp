@@ -13,3 +13,9 @@ char* format(const char *fmt, ...) {
 	va_end(ap);
 	return buf;
 }
+
+char* deep_copy(const char *str) {
+	char* buf = malloc(sizeof(char) * strlen(str));
+	strcpy(buf, str);
+	return buf;
+}
