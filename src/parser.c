@@ -94,6 +94,7 @@ struct Node** reserve_nodes(struct Node** nodes, size_t *buf_size) {
 }
 
 struct Node* parse(const char *str, size_t *idx) {
+	while(is_white(str[*idx])) ++(*idx);
 	if (str[*idx] == EOF) return NULL;
 	else if (str[*idx] == '(') {
 		//要素を最後の要素のcdrに代入していく
