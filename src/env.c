@@ -11,18 +11,20 @@ struct Var* vars;
 uint32_t var_reserved_size = 256;
 uint32_t var_size = 0;
 
-uint32_t call_level = 0, nest_level = 0;
+uint32_t find_call_level = 0, resist_call_level = 0, nest_level = 0;
 
 size_t* callstack;
 uint32_t callstack_reserved_size = 256;
 uint32_t callstack_size = 0;
+
+bool is_head = true;
 // internal functions
 // 変数の参照の実装
 // クロージャなので定義元の変数も参照できる。
 //
 int64_t find_idx (char* key) {
 	//call_levelが同じ間だけルックアップをする
-	for (int64_t i = var_size - 1; i >= 0 && vars[i].call == call_level; --i) {
+	for (int64_t i = var_size - 1; i >= 0 && vars[i].call == find_call_level; --i) {
 		if (strcmp(key, vars[i].key) == 0)
 			return i;
 	}
@@ -76,38 +78,51 @@ void env_quit() {
 }
 
 void into_scope() {
+	is_head = true;
 	++nest_level;
 }
 
 void exit_scope() {
 	for (int64_t i = var_size - 1; i >= 0; --i) {
-		if (vars[i].nest >= nest_level && vars[i].call == call_level) {
-			//変数はGCの管理対象外なので参照しなくなった時点で消す
-			free(vars[i].key);
-			--var_size;
-		}
-		else
+		//変数はGCの管理対象外なので参照しなくなった時点で消す
+		free(vars[i].key);
+		--var_size;
+		if (vars[i].is_head)
 			break;
 	}
 	--nest_level;
 }
 
-bool into_func(uint32_t pos) {
+void start_resist_real_arg() {
+	is_head = true;
+	++resist_call_level;
+}
+
+uint32_t resist_real_arg(char* key, struct Node* node) {
+	struct Var var = {is_head, deep_copy(key), node, resist_call_level, 0};
+	APPEND(struct Var, vars, var_reserved_size, var_size, var);
+	return var_size - 1;
+}
+
+bool enter_func(uint32_t pos) {
+	find_call_level = resist_call_level;
 	APPEND(size_t, callstack, callstack_reserved_size, callstack_size, pos);
-	++call_level;
 	return true;
 }
 
 void exit_func() {
 	for(int64_t i = var_size; i >= 0; --i) {
-		if (vars[i].call >= call_level) {
+		if (vars[i].call >= find_call_level) {
 			//変数名はGCの管理対象外なので参照しなくなった時点で消す
 			free(vars[i].key);
 			--var_size;
+			if (vars[i].is_head)
+				break;
 		}
 	}
 	--callstack_size;
-	--call_level;
+	--resist_call_level;
+	--find_call_level;
 }
 
 struct Node* find(char* key) {
@@ -118,16 +133,12 @@ struct Node* find(char* key) {
 }
 
 uint32_t resist(char* key, struct Node* node) {
-	struct Var var = {deep_copy(key), node, call_level, nest_level};
+	struct Var var = {is_head, deep_copy(key), node, resist_call_level, nest_level};
 	APPEND(struct Var, vars, var_reserved_size, var_size, var);
+	is_head = false;
 	return var_size - 1;
 }
 
-uint32_t resist_real_arg(char* key, struct Node* node) {
-	struct Var var = {deep_copy(key), node, call_level + 1, 0};
-	APPEND(struct Var, vars, var_reserved_size, var_size, var);
-	return var_size - 1;
-}
 
 uint32_t current_fptr() {
 	return var_size;
@@ -135,7 +146,7 @@ uint32_t current_fptr() {
 
 void env_dump() {
 	printf("------------ env dump -------------\n");
-	printf("call %d nest %d\n", call_level, nest_level);
+	printf("rcall %d fcall %d nest %d\n", resist_call_level, find_call_level, nest_level);
 	printf("----------- vars dump -------------\n");
 	printf("                name | call | nest\n");
 	for (size_t i = 0; i < var_size; ++i) {

@@ -4,6 +4,7 @@
 #include "node.h"
 
 struct Var{
+	bool is_head;
 	char* key;
 	struct Node* node;
 	//関数が呼ばれたら++call, 抜けると--calll
@@ -19,7 +20,8 @@ uint32_t resist_real_arg(char* key, struct Node* node);
 uint32_t current_fptr();
 void into_scope();
 void exit_scope();
-bool into_func(uint32_t pos);
+void start_resist_real_arg();
+bool enter_func(uint32_t pos);
 void exit_func();
 void env_dump();
 
