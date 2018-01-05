@@ -320,11 +320,11 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	NULLCHECK(args);
 	ASSERT (fun->tag == Fun, fprintf(stderr, "関数ではないです\n"));
 	ASSERT (fun->fun.arg_num == sexp_len(*args), fprintf(stderr, "関数の引数の数と渡された引数の数が一致しません\n"));
-	into_func(fun->fun.pos);
 	for (size_t i = 0; i < fun->fun.arg_num; ++i) {
 		NULLCHECK(fun->fun.args[i]);
-		resist(fun->fun.args[i], eval(idx(args, i)));
+		resist_real_arg(fun->fun.args[i], eval(idx(args, i)));
 	}
+	into_func(fun->fun.pos);
 	struct Node* result = eval(fun->fun.body);
 	exit_func();
 	return result;
