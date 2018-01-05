@@ -15,6 +15,7 @@ void env_init();
 void env_quit();
 struct Node* find(char* key);
 uint32_t resist(char* key, struct Node* node);
+uint32_t resist_real_arg(char* key, struct Node* node);
 uint32_t current_fptr();
 void into_scope();
 void exit_scope();

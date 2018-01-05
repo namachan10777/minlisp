@@ -3,17 +3,28 @@
 #include "env.h"
 #include "util.h"
 #include "gc.h"
+#include "macro.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
+#define ASSERT(cond, ext) do{ \
+	if (!(cond)){ \
+		fprintf(stderr, "%s:%d %s\n", __FILE__, __LINE__, __func__); \
+		ext; \
+		return NULL; \
+	}}while(false)
+
+#define NULLCHECK(node) do {\
+	if (node == NULL) {\
+		fprintf(stderr, "%s:%d %s\n", __FILE__, __LINE__, __func__); \
+	}}while(false)
+
 struct Node* deref(char* key) {
 	struct Node *node = find(key);
-	if (node == NULL) {
-		fprintf (stderr, "%s : 未定義の変数です\n", key);
-	}
+	ASSERT(node != NULL, fprintf (stderr, "%s : 未定義の変数です\n", key));
 	return node;
 }
 
@@ -379,7 +390,8 @@ struct Node* eval_sform(enum SpecialForm sform, struct Node* args) {
 }
 
 struct Node* eval (struct Node* node) {
-	gc_collect();
+	NULLCHECK(node);
+	//gc_collect();
 	switch (node->tag) {
 	//nil, 数値, 文字列, 関数, 特殊形式は評価されてもそのまま
 	case Nil:

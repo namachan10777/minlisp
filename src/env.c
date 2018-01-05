@@ -17,11 +17,16 @@ size_t* callstack;
 uint32_t callstack_reserved_size = 256;
 uint32_t callstack_size = 0;
 // internal functions
+// 変数の参照の実装
+// クロージャなので定義元の変数も参照できる。
+//
 int64_t find_idx (char* key) {
+	//call_levelが同じ間だけルックアップをする
 	for (int64_t i = var_size - 1; i >= 0 && vars[i].call == call_level; --i) {
 		if (strcmp(key, vars[i].key) == 0)
 			return i;
 	}
+	//funに登録されている定義場所情報から定義元変数を参照する
 	if (callstack_size > 0) {
 		for (int64_t i = callstack[callstack_size-1]; i >= 0; --i) {
 			if (strcmp(key, vars[i].key) == 0)
@@ -114,6 +119,12 @@ struct Node* find(char* key) {
 
 uint32_t resist(char* key, struct Node* node) {
 	struct Var var = {deep_copy(key), node, call_level, nest_level};
+	APPEND(struct Var, vars, var_reserved_size, var_size, var);
+	return var_size - 1;
+}
+
+uint32_t resist_real_arg(char* key, struct Node* node) {
+	struct Var var = {deep_copy(key), node, call_level + 1, 0};
 	APPEND(struct Var, vars, var_reserved_size, var_size, var);
 	return var_size - 1;
 }
