@@ -15,3 +15,5 @@
 		}\
 		ptr[size++] = x; \
 	}while(false)
+
+#define DUMP(node) fprintf(stderr, "dump %s:%d:%s %s\n", __FILE__, __LINE__, __func__, pp(*node));
