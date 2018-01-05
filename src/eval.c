@@ -127,17 +127,18 @@ struct Node* eval_mod(struct Node* args) {
 }
 
 struct Node* eval_not(struct Node* arg) {
-	if (sexp_len(*arg) == 1 && arg->pair.car->tag != Bool) {
+	struct Node* b = eval(arg->pair.car);
+	if (sexp_len(*arg) == 1 && b->tag != Bool) {
 		fprintf(stderr, "真偽値型以外にnotは適用できません\n");
 		return NULL;
 	}
-	return alloc_bool(!arg->pair.car->boolean);
+	return alloc_bool(!b->boolean);
 }
 
 struct Node* eval_and(struct Node* args) {
 	bool acc = true;
 	ITER_REF(b, args) {
-		if (b->tag != Bool) {
+		if ((b = eval(b))->tag != Bool) {
 			fprintf(stderr, "真偽値型以外にandは適用できません\n");
 			return NULL;
 		}
@@ -149,7 +150,7 @@ struct Node* eval_and(struct Node* args) {
 struct Node* eval_or(struct Node* args) {
 	bool acc = false;
 	ITER_REF(b, args) {
-		if (b->tag != Bool) {
+		if ((b = eval(b))->tag != Bool) {
 			fprintf(stderr, "真偽値型以外にorは適用できません\n");
 			return NULL;
 		}
