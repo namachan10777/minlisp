@@ -5,8 +5,8 @@
 #include "node.h"
 #include "macro.h"
 
-char* str_slice(char* buf, const char* str, size_t start, size_t end) {
-	for (size_t from = start, to = 0; from < end; ++from, ++to) {
+char* str_slice(char* buf, const char* str, int64_t start, int64_t end) {
+	for (int64_t from = start, to = 0; from < end; ++from, ++to) {
 		buf[to] = str[from];
 	}
 	buf[end-start] = '\0';
@@ -14,7 +14,7 @@ char* str_slice(char* buf, const char* str, size_t start, size_t end) {
 }
 
 char* read_all(FILE* fp) {
-	size_t buf_size = 256, length = 0;
+	int64_t buf_size = 256, length = 0;
 	char* buf;
 	INIT(char, buf, buf_size);
 	char c;
@@ -34,8 +34,8 @@ bool is_white(const char c) {
 	return c == ' ' || c == '\n' || c == '\t';
 }
 
-struct Node* parse_num(const char *str, size_t *idx) {
-	size_t start = *idx, end;
+struct Node* parse_num(const char *str, int64_t *idx) {
+	int64_t start = *idx, end;
 	char buf[256];
 	for (;is_digit(str[*idx]) || str[*idx] == '.'; ++(*idx)) {
 		end = *idx + 1;
@@ -45,8 +45,8 @@ struct Node* parse_num(const char *str, size_t *idx) {
 	return alloc_num(atof(slice));
 }
 
-struct Node* parse_symbol(const char *str, size_t *idx) {
-	size_t start = *idx, end; 
+struct Node* parse_symbol(const char *str, int64_t *idx) {
+	int64_t start = *idx, end; 
 	for (;!is_white(str[*idx]) && str[*idx] != '(' && str[*idx] != ')' && str[*idx] != EOF; ++(*idx)) {
 		end = *idx+1;
 	}
@@ -69,8 +69,8 @@ struct Node* parse_symbol(const char *str, size_t *idx) {
 		return alloc_symbol(slice);
 }
 
-struct Node* parse_str(const char *str, size_t *idx) {
-	size_t start = *idx, end;
+struct Node* parse_str(const char *str, int64_t *idx) {
+	int64_t start = *idx, end;
 	for (++(*idx);; ++(*idx)) {
 		if (str[*idx] == EOF) return NULL;
 		if (str[*idx] == '\\' && str[*idx+1] == '"') *idx += 2;
@@ -84,23 +84,23 @@ struct Node* parse_str(const char *str, size_t *idx) {
 	return alloc_str(slice);
 }
 
-struct Node** reserve_nodes(struct Node** nodes, size_t *buf_size) {
+struct Node** reserve_nodes(struct Node** nodes, int64_t *buf_size) {
 	*buf_size = *buf_size * 2;
 	struct Node** buf = malloc(sizeof(struct Node*) * *buf_size * 2);
-	for (size_t i = 0; i < *buf_size; ++i)
+	for (int64_t i = 0; i < *buf_size; ++i)
 		buf[i] = nodes[i];
 	free(nodes);
 	return buf;
 }
 
-struct Node* parse(const char *str, size_t *idx) {
+struct Node* parse(const char *str, int64_t *idx) {
 	while(is_white(str[*idx])) ++(*idx);
 	if (str[*idx] == EOF) return NULL;
 	else if (str[*idx] == '(') {
 		//要素を最後の要素のcdrに代入していく
 		//最初の要素は使わないので静的に確保していい
 		struct Node** nodes;
-		size_t nodes_reserved_size = 32, nodes_size = 0;
+		int64_t nodes_reserved_size = 32, nodes_size = 0;
 		INIT(struct Node*, nodes, nodes_reserved_size);
 		bool is_pair = false;
 		for (*idx = *idx+1;;) {
@@ -155,7 +155,7 @@ struct Node* start_parse (const char* file_name) {
 	FILE* fp = fopen(file_name, "r");
 	if (fp == NULL) return NULL;
 	char* buf = read_all(fp);
-	size_t idx = 0;
+	int64_t idx = 0;
 	struct Node* node = parse(buf, &idx);
 	free(buf);
 	fclose(fp);

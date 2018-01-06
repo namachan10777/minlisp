@@ -8,14 +8,14 @@
 #include "gc.h"
 
 struct Var* vars;
-uint32_t var_reserved_size = 256;
-uint32_t var_size = 0;
+int64_t var_reserved_size = 256;
+int64_t var_size = 0;
 
-uint32_t find_call_level = 0, resist_call_level = 0, nest_level = 0;
+int64_t find_call_level = 0, resist_call_level = 0, nest_level = 0;
 
-size_t* callstack;
-uint32_t callstack_reserved_size = 256;
-uint32_t callstack_size = 0;
+int64_t* callstack;
+int64_t callstack_reserved_size = 256;
+int64_t callstack_size = 0;
 
 bool is_head = true;
 // internal functions
@@ -41,7 +41,7 @@ int64_t find_idx (char* key) {
 // exernal functions
 void env_init() {
 	INIT(struct Var, vars, var_reserved_size);
-	INIT(size_t, callstack, callstack_reserved_size);
+	INIT(int64_t, callstack, callstack_reserved_size);
 
 	resist("+", alloc_bfun(Add));
 	resist("-", alloc_bfun(Sub));
@@ -69,7 +69,7 @@ void env_init() {
 }
 
 void env_quit() {
-	for (size_t i = 0; i < var_size; ++i) {
+	for (int64_t i = 0; i < var_size; ++i) {
 		free(vars[i].key);
 		gc_free(vars[i].node);
 	}
@@ -106,7 +106,7 @@ uint32_t resist_real_arg(char* key, struct Node* node) {
 
 bool enter_func(uint32_t pos) {
 	find_call_level = resist_call_level;
-	APPEND(size_t, callstack, callstack_reserved_size, callstack_size, pos);
+	APPEND(int64_t, callstack, callstack_reserved_size, callstack_size, pos);
 	return true;
 }
 
@@ -146,15 +146,15 @@ uint32_t current_fptr() {
 
 void env_dump() {
 	printf("------------ env dump -------------\n");
-	printf("rcall %d fcall %d nest %d\n", resist_call_level, find_call_level, nest_level);
+	printf("rcall %ld fcall %ld nest %ld\n", resist_call_level, find_call_level, nest_level);
 	printf("----------- vars dump -------------\n");
 	printf("                name | call | nest\n");
-	for (size_t i = 0; i < var_size; ++i) {
+	for (int64_t i = 0; i < var_size; ++i) {
 		printf("%20s | %4d | %3d\n", vars[i].key, vars[i].call, vars[i].nest);
 	}
 	printf("----------- stack dump -------------\n");
 	if (callstack_size > 0) {
-		for (size_t i = 0; i < callstack_size - 1; ++i) {
+		for (int64_t i = 0; i < callstack_size - 1; ++i) {
 			printf("%ld ->", callstack[i]);
 		}
 		printf("%ld\n", callstack[callstack_size]);
