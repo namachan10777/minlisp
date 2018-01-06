@@ -6,13 +6,13 @@
 #include "macro.h"
 #include "env.h"
 //ノードの数
-uint64_t node_num = 0;
+int node_num = 0;
 //GCを呼ばれたけども実行しなかったもののカウント。実行するとリセットする。
-uint64_t call_cnt = 0;
+int call_cnt = 0;
 //32回呼ばれるごとにGCを実行
-const uint64_t call_cnt_thresh = 32;
+const int call_cnt_thresh = 32;
 //現在確保されてるノード格納スペースの大きさ
-uint64_t reserved_size = 1024;
+int reserved_size = 1024;
 //ノード格納スペースへのポインタ
 struct Node **heap;
 
@@ -53,7 +53,7 @@ void gc_free(struct Node* node) {
 				break;
 			}
 		case Fun: {
-				for (size_t i = 0; i < node->fun.arg_num; ++i) {
+				for (int i = 0; i < node->fun.arg_num; ++i) {
 					free(node->fun.args[i]);
 				}
 				free(node);
@@ -74,14 +74,14 @@ void mark_rec(struct Node* node) {
 
 void mark() {
 	struct Var* var_table = env_vars();
-	size_t var_size = env_var_size();
-	for (size_t i = 0; i < var_size; ++i) {
+	int var_size = env_var_size();
+	for (int i = 0; i < var_size; ++i) {
 		mark_rec(var_table[i].node);
 	}
 }
 
 void sweep() {
-	for (size_t i = 0; i < node_num; ++i) {
+	for (int i = 0; i < node_num; ++i) {
 		if (heap[i] == NULL) continue;
 		if (heap[i]->visited) {
 			heap[i]->visited = false;
@@ -94,8 +94,8 @@ void sweep() {
 }
 
 void compaction() {
-	size_t last_idx = 0;
-	for (size_t i = 0; i < node_num; ++i) {
+	int last_idx = 0;
+	for (int i = 0; i < node_num; ++i) {
 		if (heap[i] == NULL){
 			--node_num;
 			continue;

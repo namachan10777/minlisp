@@ -7,7 +7,7 @@
 	do { \
 		if (size >= reserved_size) { \
 			type *buf = malloc(sizeof(type) * reserved_size * 2); \
-			for (int64_t i = 0; i < reserved_size; ++i) { \
+			for (int i = 0; i < reserved_size; ++i) { \
 				buf[i] = ptr[i];\
 			} \
 			reserved_size *= 2; \

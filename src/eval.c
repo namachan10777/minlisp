@@ -19,7 +19,7 @@
 
 #define NULLCHECK(node) do {\
 	if (node == NULL) {\
-		fprintf(stderr, "%s:%d %s\n", __FILE__, __LINE__, __func__); \
+		return NULL; \
 	}}while(false)
 
 struct Node* deref(char* key) {
@@ -291,9 +291,9 @@ struct Node* eval_lambda(struct Node* args, struct Node* body) {
 		return alloc_fun(NULL, 0, body);
 	}
 	else if (args->tag == Pair) {
-		size_t fun_arg_num = sexp_len(*args);
+		int fun_arg_num = sexp_len(*args);
 		char** fun_args = malloc(sizeof(char*) * fun_arg_num);
-		size_t i = 0;
+		int i = 0;
 		ITER_REF(arg, args) {
 			ASSERT (arg->tag == Symbol, fprintf(stderr, "仮引数が不正です\n"));
 			fun_args[i++] = deep_copy(arg->symbol);
@@ -321,7 +321,7 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	ASSERT (fun->tag == Fun, fprintf(stderr, "関数ではないです\n"));
 	ASSERT (fun->fun.arg_num == sexp_len(*args), fprintf(stderr, "関数の引数の数と渡された引数の数が一致しません\n"));
 	start_resist_real_arg();
-	for (size_t i = 0; i < fun->fun.arg_num; ++i) {
+	for (int i = 0; i < fun->fun.arg_num; ++i) {
 		NULLCHECK(fun->fun.args[i]);
 		resist_real_arg(fun->fun.args[i], eval(idx(args, i)));
 	}

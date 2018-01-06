@@ -7,13 +7,13 @@
 #include "gc.h"
 #include "env.h"
 
-uint32_t sexp_len(struct Node pair) {
+int sexp_len(struct Node pair) {
 	if (pair.tag != Pair) return 0;
 	return 1 + sexp_len(*pair.pair.cdr);
 }
 
-struct Node* idx(struct Node* list, size_t idx) {
-	size_t i = 0;
+struct Node* idx(struct Node* list, int idx) {
+	int i = 0;
 	ITER_REF(node, list) {
 		if (idx == i++)
 			return node;
@@ -75,7 +75,7 @@ char* pp(struct Node node) {
 		}
 	case Fun: {
 			int arg_str_length = 0;
-			for (size_t i = 0; i < node.fun.arg_num; ++i) {
+			for (int i = 0; i < node.fun.arg_num; ++i) {
 				arg_str_length += strlen(node.fun.args[i]) + 1;
 			}
 			--arg_str_length;
@@ -83,7 +83,7 @@ char* pp(struct Node node) {
 			int len = 6 + 1 + arg_str_length + 1 + strlen(body_str);
 			char* buf = malloc(sizeof(char) * len);
 			sprintf(buf, "(lambda ");
-			for(size_t i = 0; i < node.fun.arg_num; ++i) {
+			for(int i = 0; i < node.fun.arg_num; ++i) {
 				strcat(buf, node.fun.args[i]);
 				strcat(buf, " ");	
 			}
@@ -160,7 +160,7 @@ struct Node* alloc_pair(struct Node* car, struct Node* cdr) {
 	node->pair.cdr = cdr;
 	return node;
 }
-struct Node* alloc_fun(char** args, size_t arg_num, struct Node* body) {
+struct Node* alloc_fun(char** args, int arg_num, struct Node* body) {
 	struct Node* node = gc_alloc();
 	node->tag = Fun;
 	node->fun.args = args;

@@ -53,9 +53,9 @@ struct Pair{
 
 struct Fun {
 	char** args;
-	size_t arg_num;
+	int arg_num;
 	struct Node* body;
-	uint32_t pos;
+	int pos;
 };
 
 struct Node {
@@ -75,8 +75,8 @@ struct Node {
 };
 
 char* pp (struct Node node);
-uint32_t sexp_len(struct Node sexp);
-struct Node* idx(struct Node* nodes, size_t idx);
+int sexp_len(struct Node sexp);
+struct Node* idx(struct Node* nodes, int idx);
 
 struct Node* alloc_nil();
 struct Node* alloc_bool(bool boolean);
@@ -84,7 +84,7 @@ struct Node* alloc_num(float num);
 struct Node* alloc_symbol(char* symbol);
 struct Node* alloc_str(char* str);
 struct Node* alloc_pair(struct Node* car, struct Node* cdr);
-struct Node* alloc_fun(char** args, size_t args_num, struct Node* body);
+struct Node* alloc_fun(char** args, int args_num, struct Node* body);
 struct Node* alloc_bfun(enum BuiltinFun);
 struct Node* alloc_sform(enum SpecialForm);
 
