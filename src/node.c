@@ -46,8 +46,8 @@ char* pp(struct Node node) {
 			return buf;
 		}
 	case Bool: {
-		if (node.boolean) return format("true");
-		else return format("false");
+		if (node.boolean) return deep_copy("true");
+		else return deep_copy("false");
 	}
 	case Symbol: {
 			// sym + '\0'
@@ -94,31 +94,31 @@ char* pp(struct Node node) {
 		}
 	case BFun: {
 			switch (node.bfun) {
-				case Add : return format("+");
-				case Sub : return format("-");
-				case Mul : return format("*");
-				case Div : return format("/");
-				case Mod : return format("%");
-				case Not : return format("not");
-				case And : return format("and");
-				case Or : return format("or");
-				case Gret: return format("<");
-				case Less: return format(">");
-				case Eq: return format("=");
-				case Car : return format("car");
-				case Cdr : return format("cdr");
-				case Cons : return format("cons");
-				case List : return format("list");
-				case Print : return format("print");
+				case Add : return deep_copy("+");
+				case Sub : return deep_copy("-");
+				case Mul : return deep_copy("*");
+				case Div : return deep_copy("/");
+				case Mod : return deep_copy("%");
+				case Not : return deep_copy("not");
+				case And : return deep_copy("and");
+				case Or : return deep_copy("or");
+				case Gret: return deep_copy("<");
+				case Less: return deep_copy(">");
+				case Eq: return deep_copy("=");
+				case Car : return deep_copy("car");
+				case Cdr : return deep_copy("cdr");
+				case Cons : return deep_copy("cons");
+				case List : return deep_copy("list");
+				case Print : return deep_copy("print");
 			}
 		}
 	case SForm: {
 			switch (node.sform) {
-				case If : return format("if");
-				case Let : return format("let");
-				case Quote : return format("quote");
-				case Defun : return format("defun");
-				case Lambda : return format("lambda");
+				case If : return deep_copy("if");
+				case Let : return deep_copy("let");
+				case Quote : return deep_copy("quote");
+				case Defun : return deep_copy("defun");
+				case Lambda : return deep_copy("lambda");
 			}
 		}
 	}
