@@ -26,6 +26,7 @@ void gc_quit() {
 
 struct Node* gc_alloc() {
 	struct Node *node = (struct Node*)malloc(sizeof(struct Node));
+	node->visited = false;
 	APPEND(struct Node*, heap, reserved_size, node_num, node);
 	return node;
 }
