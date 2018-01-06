@@ -109,6 +109,7 @@ char* pp(struct Node node) {
 				case Cdr : return format("cdr");
 				case Cons : return format("cons");
 				case List : return format("list");
+				case Print : return format("print");
 			}
 		}
 	case SForm: {
