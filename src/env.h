@@ -9,19 +9,19 @@ struct Var{
 	struct Node* node;
 	//関数が呼ばれたら++call, 抜けると--calll
 	//ネストが作られたら++nest, 抜けると--nest
-	uint32_t call, nest;
+	int call, nest;
 };
 
 void env_init();
 void env_quit();
 struct Node* find(char* key);
-uint32_t resist(char* key, struct Node* node);
-uint32_t resist_real_arg(char* key, struct Node* node);
-uint32_t current_fptr();
+int resist(char* key, struct Node* node);
+int resist_real_arg(char* key, struct Node* node);
+int current_fptr();
 void into_scope();
 void exit_scope();
 void start_resist_real_arg();
-bool enter_func(uint32_t pos);
+bool enter_func(int pos);
 void exit_func();
 void env_dump();
 
