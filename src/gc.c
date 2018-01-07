@@ -28,6 +28,7 @@ struct Node* gc_alloc() {
 	struct Node *node = (struct Node*)malloc(sizeof(struct Node));
 	node->visited = false;
 	APPEND(struct Node*, heap, reserved_size, node_num, node);
+	stack(node);
 	return node;
 }
 
@@ -90,7 +91,8 @@ void mark() {
 	struct Box* env = get_env();
 	int env_size = get_env_size();
 	for (int i = 0; i < env_size; ++i) {
-		mark_rec(env[i].node);
+		if (env[i].tag == Var || env[i].tag == RVal)
+			mark_rec(env[i].node);
 	}
 }
 

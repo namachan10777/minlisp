@@ -122,6 +122,11 @@ int resist(char* key, struct Node* node) {
 	return env_size - 1;
 }
 
+void stack(struct Node* node) {
+	struct Box rval = {RVal, NULL, node};
+	APPEND(struct Box, env, env_reserved_size, env_size, rval);
+}
+
 int get_env_size() {
 	return env_size;
 }

@@ -22,6 +22,7 @@ void env_init();
 void env_quit();
 struct Node* find(char* key);
 int resist(char* key, struct Node* node);
+void stack(struct Node* node);
 void into_scope();
 void exit_scope();
 bool into_func(int pos);

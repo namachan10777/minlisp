@@ -430,7 +430,7 @@ struct Node* eval_sform(enum SpecialForm sform, struct Node* args) {
 
 struct Node* eval (struct Node* node) {
 	NULLCHECK(node);
-	//gc_collect();
+	gc_collect();
 	switch (node->tag) {
 	//nil, 数値, 文字列, 関数, 特殊形式は評価されてもそのまま
 	case Nil:
