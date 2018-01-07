@@ -339,6 +339,14 @@ struct Node* eval_print(struct Node* arg) {
 	return alloc_nil();
 }
 
+struct Node* eval_progn(struct Node* args) {
+	struct Node* retval;
+	ITER_REF(node, args) {
+		retval = eval(node);
+	}
+	return retval;
+}
+
 struct Node* eval_bfun(enum BuiltinFun bfun, struct Node* args) {
 	NULLCHECK(args);
 	switch(bfun) {
@@ -358,6 +366,7 @@ struct Node* eval_bfun(enum BuiltinFun bfun, struct Node* args) {
 	case Cons: return eval_cons(args);
 	case List: return eval_list(args);
 	case Print: return eval_print(args);
+	case Progn: return eval_progn(args);
 	}
 	return NULL;
 }

@@ -60,6 +60,7 @@ void env_init() {
 	resist(">", alloc_bfun(Less));
 	resist("=", alloc_bfun(Eq));
 	resist("print", alloc_bfun(Print));
+	resist("progn", alloc_bfun(Progn));
 
 	resist("if", alloc_sform(If));
 	resist("let", alloc_sform(Let));

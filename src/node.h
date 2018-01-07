@@ -33,7 +33,8 @@ enum BuiltinFun {
 	Cdr,
 	Car,
 	List,
-	Print
+	Print,
+	Progn
 };
 
 enum SpecialForm {
