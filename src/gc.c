@@ -67,9 +67,21 @@ void gc_free(struct Node* node) {
 //internal function
 void mark_rec(struct Node* node) {
 	node->visited = true;
-	if (node->tag == Pair) {
+	switch (node->tag) {
+	case Nil:
+	case Bool:
+	case Num:
+	case Str:
+	case Symbol:
+	case BFun: 
+	case SForm:
+		break;
+	case Pair:
 		mark_rec(node->pair.car);
 		mark_rec(node->pair.cdr);
+		break;
+	case Fun:
+		mark_rec(node->fun.body);
 	}
 }
 
