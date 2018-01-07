@@ -150,13 +150,34 @@ struct Node* parse(const char *str, int *idx) {
 	else return parse_symbol(str, idx);
 }
 
+struct Node* parse_src(const char* str, int* idx) {
+	struct Node** progs;
+	int progs_reserved_size = 32, progs_size = 0;
+	INIT(struct Node*, progs, progs_reserved_size);
+	while(str[*idx] != EOF) {
+		if (is_white(str[*idx])) {
+			++(*idx);
+		}
+		else {
+			struct Node* prog = parse(str, idx);
+			if (prog == NULL) return NULL;
+			APPEND(struct Node*, progs, progs_reserved_size, progs_size, prog);
+		}
+	}
+	struct Node* args = alloc_nil();
+	for (int idx = progs_size - 1; idx >= 0; --idx) {
+		args = alloc_pair(progs[idx], args);
+	}
+	return alloc_pair(alloc_bfun(Progn), args);
+}
+
 //失敗したらNULLを返す(設計とは)
 struct Node* start_parse (const char* file_name) {
 	FILE* fp = fopen(file_name, "r");
 	if (fp == NULL) return NULL;
 	char* buf = read_all(fp);
 	int idx = 0;
-	struct Node* node = parse(buf, &idx);
+	struct Node* node = parse_src(buf, &idx);
 	free(buf);
 	fclose(fp);
 	return node;
