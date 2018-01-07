@@ -278,6 +278,16 @@ struct Node* eval_let(char* symbol, struct Node* def, struct Node* exp) {
 	return result;
 }
 
+struct Node* eval_letS(char* symbol, struct Node* def) {
+	NULLCHECK(symbol);
+	NULLCHECK(def);
+	NULLCHECK(exp);
+	def = eval(def);
+	NULLCHECK(def);
+	resist(symbol, def);
+	return alloc_nil();
+}
+
 //引数の型チェック
 struct Node* eval_lambda(struct Node* args, struct Node* body) {
 	NULLCHECK(args);
@@ -313,6 +323,15 @@ struct Node* eval_defun(char* symbol, struct Node* args, struct Node* body, stru
 	NULLCHECK(exp);
 	struct Node* lambda = eval_lambda(args, body);
 	return eval_let(symbol, lambda, exp);
+}
+
+struct Node* eval_defunS(char* symbol, struct Node* args, struct Node* body) {
+	NULLCHECK(symbol);
+	NULLCHECK(args);
+	NULLCHECK(body);
+	NULLCHECK(exp);
+	struct Node* lambda = eval_lambda(args, body);
+	return eval_letS(symbol, lambda);
 }
 
 struct Node* eval_fun(struct Node* fun, struct Node* args) {
@@ -379,14 +398,20 @@ struct Node* eval_sform(enum SpecialForm sform, struct Node* args) {
 			return eval_if(idx(args, 0), idx(args, 1), idx(args, 2));
 		}
 	case Let: {
-			ASSERT (sexp_len(*args) == 3, fprintf(stderr, "letには3つの引数が必要です\n"));
+			ASSERT (sexp_len(*args) == 2 || sexp_len(*args) == 3, fprintf(stderr, "letには2つか3つの引数が必要です\n"));
 			ASSERT (args->pair.car->tag == Symbol, fprintf(stderr, "letの第一引数はシンボルでなければいけません\n"));
-			return eval_let(idx(args, 0)->symbol, idx(args, 1), idx(args, 2));
+			if (sexp_len(*args) == 2)
+				return eval_letS(idx(args, 0)->symbol, idx(args, 1));
+			else 
+				return eval_let(idx(args, 0)->symbol, idx(args, 1), idx(args, 2));
 		}
 	case Defun:{
 			ASSERT (args->pair.car->tag == Symbol, fprintf(stderr, "defunの第一引数はシンボルでなければいけません\n"));
-			ASSERT (sexp_len(*args) == 4, fprintf(stderr, "defunには4つの引数が必要です\n"));
-			return eval_defun(idx(args, 0)->symbol, idx(args, 1), idx(args, 2), idx(args, 3));
+			ASSERT (sexp_len(*args) == 3 || sexp_len(*args) == 4, fprintf(stderr, "defunには3つか3つか3つか4つの引数が必要です\n"));
+			if (sexp_len(*args) == 3)
+				return eval_defunS(idx(args, 0)->symbol, idx(args, 1), idx(args, 2));
+			else
+				return eval_defun(idx(args, 0)->symbol, idx(args, 1), idx(args, 2), idx(args, 3));
 		}
 	case Lambda:{
 			ASSERT (sexp_len(*args) == 2, fprintf(stderr, "lambdaには2つの引数が必要です\n"));
