@@ -72,7 +72,6 @@ void env_init() {
 void env_quit() {
 	for (int i = 0; i < var_size; ++i) {
 		free(vars[i].key);
-		gc_free(vars[i].node);
 	}
 	free(callstack);
 	free(vars);
