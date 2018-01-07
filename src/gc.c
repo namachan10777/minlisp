@@ -57,6 +57,7 @@ void gc_free(struct Node* node) {
 				for (int i = 0; i < node->fun.arg_num; ++i) {
 					free(node->fun.args[i]);
 				}
+				free(node->fun.args);
 				free(node);
 				break;
 			}
