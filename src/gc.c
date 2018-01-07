@@ -87,10 +87,10 @@ void mark_rec(struct Node* node) {
 }
 
 void mark() {
-	struct Var* var_table = env_vars();
-	int var_size = env_var_size();
-	for (int i = 0; i < var_size; ++i) {
-		mark_rec(var_table[i].node);
+	struct Box* env = get_env();
+	int env_size = get_env_size();
+	for (int i = 0; i < env_size; ++i) {
+		mark_rec(env[i].node);
 	}
 }
 

@@ -7,31 +7,28 @@
 #include "util.h"
 #include "gc.h"
 
-struct Var* vars;
-int var_reserved_size = 256;
-int var_size = 0;
-
-int find_call_level = 0, resist_call_level = 0, nest_level = 0;
+struct Box* env;
+int env_reserved_size = 256;
+int env_size = 0;
 
 int* callstack;
 int callstack_reserved_size = 256;
 int callstack_size = 0;
 
-bool is_head = true;
 // internal functions
 // 変数の参照の実装
 // クロージャなので定義元の変数も参照できる。
 //
 int find_idx (char* key) {
-	//call_levelが同じ間だけルックアップをする
-	for (int i = var_size - 1; i >= 0 && vars[i].call == find_call_level; --i) {
-		if (strcmp(key, vars[i].key) == 0)
+	//Block内から探す
+	for (int i = env_size - 1; env[i].tag != BlockHead; --i) {
+		if (strcmp(key, env[i].key) == 0)
 			return i;
 	}
 	//funに登録されている定義場所情報から定義元変数を参照する
 	if (callstack_size > 0) {
 		for (int i = callstack[callstack_size-1]; i >= 0; --i) {
-			if (strcmp(key, vars[i].key) == 0)
+			if (strcmp(key, env[i].key) == 0)
 				return i;
 		}
 	}
@@ -40,7 +37,7 @@ int find_idx (char* key) {
 
 // exernal functions
 void env_init() {
-	INIT(struct Var, vars, var_reserved_size);
+	INIT(struct Box, env, env_reserved_size);
 	INIT(int, callstack, callstack_reserved_size);
 
 	resist("+", alloc_bfun(Add));
@@ -70,101 +67,64 @@ void env_init() {
 }
 
 void env_quit() {
-	for (int i = 0; i < var_size; ++i) {
-		free(vars[i].key);
+	for (int i = 0; i < env_size; ++i) {
+		free(env[i].key);
 	}
 	free(callstack);
-	free(vars);
+	free(env);
 }
 
 void into_scope() {
-	is_head = true;
-	++nest_level;
+	struct Box part = {ScopeHead, NULL, NULL};
+	APPEND(struct Box, env, env_reserved_size, env_size, part);
 }
 
 void exit_scope() {
-	for (int i = var_size - 1; i >= 0; --i) {
+	for (int i = env_size - 1; i >= 0 && (env[i].tag != BlockHead || env[i].tag != ScopeHead); --i) {
 		//変数はGCの管理対象外なので参照しなくなった時点で消す
-		free(vars[i].key);
-		--var_size;
-		if (vars[i].is_head)
-			break;
+		free(env[i].key);
+		--env_size;
+		break;
 	}
-	--nest_level;
+	if (env[env_size].tag == ScopeHead)
+		--env_size;
 }
 
-void start_resist_real_arg() {
-	is_head = true;
-	++resist_call_level;
-}
-
-int resist_real_arg(char* key, struct Node* node) {
-	struct Var var = {is_head, deep_copy(key), node, resist_call_level, 0};
-	APPEND(struct Var, vars, var_reserved_size, var_size, var);
-	return var_size - 1;
-}
-
-bool enter_func(int pos) {
-	find_call_level = resist_call_level;
+bool into_func(int pos) {
+	struct Box part = {BlockHead, NULL, NULL};
+	APPEND(struct Box, env, env_reserved_size, env_size, part);
 	APPEND(int, callstack, callstack_reserved_size, callstack_size, pos);
 	return true;
 }
 
 void exit_func() {
-	for(int i = var_size; i >= 0; --i) {
-		if (vars[i].call >= find_call_level) {
-			//変数名はGCの管理対象外なので参照しなくなった時点で消す
-			free(vars[i].key);
-			--var_size;
-			if (vars[i].is_head)
-				break;
-		}
+	for(int i = env_size; i >= 0 && env[i].tag != BlockHead; --i) {
+		//変数名はGCの管理対象外なので参照しなくなった時点で消す
+		free(env[i].key);
+		--env_size;
 	}
+	//BlockHeadを消す
+	--env_size;
 	--callstack_size;
-	--resist_call_level;
-	--find_call_level;
 }
 
 struct Node* find(char* key) {
 	int idx;
 	if ((idx = find_idx(key)) < 0)
 		return NULL;
-	return vars[idx].node;
+	return env[idx].node;
 }
 
 int resist(char* key, struct Node* node) {
-	struct Var var = {is_head, deep_copy(key), node, resist_call_level, nest_level};
-	APPEND(struct Var, vars, var_reserved_size, var_size, var);
-	is_head = false;
-	return var_size - 1;
+	struct Box var = {Var, deep_copy(key), node};
+	APPEND(struct Box, env, env_reserved_size, env_size, var);
+	return env_size - 1;
 }
 
-
-int current_fptr() {
-	return var_size;
+int get_env_size() {
+	return env_size;
 }
 
-void env_dump() {
-	printf("------------ env dump -------------\n");
-	printf("rcall %d fcall %d nest %d\n", resist_call_level, find_call_level, nest_level);
-	printf("----------- vars dump -------------\n");
-	printf("                name | call | nest\n");
-	for (int i = 0; i < var_size; ++i) {
-		printf("%20s | %4d | %3d\n", vars[i].key, vars[i].call, vars[i].nest);
-	}
-	printf("----------- stack dump -------------\n");
-	if (callstack_size > 0) {
-		for (int i = 0; i < callstack_size - 1; ++i) {
-			printf("%d ->", callstack[i]);
-		}
-		printf("%d\n", callstack[callstack_size]);
-	}
-}
-
-int env_var_size() {
-	return var_size;
-}
-
-struct Var* env_vars() {
-	return vars;
+struct Box* get_env() {
+	return env;
 }

@@ -339,12 +339,16 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	NULLCHECK(args);
 	ASSERT (fun->tag == Fun, fprintf(stderr, "関数ではないです\n"));
 	ASSERT (fun->fun.arg_num == sexp_len(*args), fprintf(stderr, "関数の引数の数と渡された引数の数が一致しません\n"));
-	start_resist_real_arg();
-	for (int i = 0; i < fun->fun.arg_num; ++i) {
-		NULLCHECK(fun->fun.args[i]);
-		resist_real_arg(fun->fun.args[i], eval(idx(args, i)));
+	struct Node** real_args = malloc(sizeof(struct Node*) * fun->fun.arg_num);
+	int idx = 0;
+	ITER_REF(node, args) {
+		real_args[idx++] = eval(node);
 	}
-	enter_func(fun->fun.pos);
+	into_func(fun->fun.pos);
+	for (int i = 0; i < fun->fun.arg_num; ++i) {
+		resist(fun->fun.args[i], real_args[i]);
+	}
+	free(real_args);
 	struct Node* result = eval(fun->fun.body);
 	exit_func();
 	return result;

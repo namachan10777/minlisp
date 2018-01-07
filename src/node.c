@@ -168,7 +168,7 @@ struct Node* alloc_fun(char** args, int arg_num, struct Node* body) {
 	node->fun.args = args;
 	node->fun.arg_num = arg_num;
 	node->fun.body = body;
-	node->fun.pos = current_fptr();
+	node->fun.pos = get_env_size();
 	return node;
 }
 struct Node* alloc_bfun(enum BuiltinFun bfun) {
