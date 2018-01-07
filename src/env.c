@@ -22,13 +22,13 @@ int callstack_size = 0;
 int find_idx (char* key) {
 	//Block内から探す
 	for (int i = env_size - 1; env[i].tag != BlockHead; --i) {
-		if (strcmp(key, env[i].key) == 0)
+		if (env[i].tag == Var && strcmp(key, env[i].key) == 0)
 			return i;
 	}
 	//funに登録されている定義場所情報から定義元変数を参照する
 	if (callstack_size > 0) {
 		for (int i = callstack[callstack_size-1]; i >= 0; --i) {
-			if (strcmp(key, env[i].key) == 0)
+			if (env[i].tag == Var && strcmp(key, env[i].key) == 0)
 				return i;
 		}
 	}
@@ -68,7 +68,8 @@ void env_init() {
 
 void env_quit() {
 	for (int i = 0; i < env_size; ++i) {
-		free(env[i].key);
+		if (env[i].tag == Var)
+			free(env[i].key);
 	}
 	free(callstack);
 	free(env);
