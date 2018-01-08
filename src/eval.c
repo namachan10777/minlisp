@@ -216,14 +216,18 @@ struct Node* eval_eq(struct Node* args) {
 
 struct Node* eval_car(struct Node* arg) {
 	NULLCHECK(arg);
-	ASSERT (arg->tag == Pair, fprintf(stderr, "ドット対以外にはcarを適用できません\n"));
-	return arg->pair.car;
+	ASSERT (sexp_len(*arg) == 1, fprintf(stderr, "carの引数は1つです\n"));
+	struct Node* pair = eval(arg->pair.car);
+	ASSERT (pair->tag == Pair, fprintf(stderr, "ドット対以外にはcarを適用できません\n"));
+	return pair->pair.car;
 }
 
 struct Node* eval_cdr(struct Node* arg) {
 	NULLCHECK(arg);
-	ASSERT (arg->tag == Pair, fprintf(stderr, "ドット対以外にはcdrを適用できません\n"));
-	return arg->pair.car;
+	ASSERT (sexp_len(*arg) == 1, fprintf(stderr, "carの引数は1つです\n"));
+	struct Node* pair = eval(arg->pair.car);
+	ASSERT (pair->tag == Pair, fprintf(stderr, "ドット対以外にはcdrを適用できません\n"));
+	return pair->pair.cdr;
 }
 
 struct Node* eval_cons(struct Node* args) {
