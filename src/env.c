@@ -99,7 +99,7 @@ bool into_func(int pos) {
 }
 
 void exit_func() {
-	for(int i = env_size; i >= 0 && env[i].tag != BlockHead; --i) {
+	for(int i = env_size - 1; i >= 0 && env[i].tag != BlockHead; --i) {
 		//変数名はGCの管理対象外なので参照しなくなった時点で消す
 		free(env[i].key);
 		--env_size;
