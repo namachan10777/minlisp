@@ -25,7 +25,7 @@ struct Node* deref(char* key) {
 //組み込み関数
 struct Node* eval_add(struct Node* args) {
 	double sum = 0.0f;
-	ITER_REF(num, args) {
+	ITER(num, args) {
 		num = eval(num);
 		ASSERT(num->tag == Num, fprintf(stderr, "加算関数に数値以外を適用しようとしました\n"));
 		sum += num->num;
@@ -44,7 +44,7 @@ struct Node* eval_sub(struct Node* args) {
 		struct Node* num = eval(args->pair.car);
 		ASSERT (num->tag == Num, fprintf(stderr, "減算関数に数値以外を適用しようとしました\n"));
 		double sub = num->num;
-		ITER_REF(num, args->pair.cdr) {
+		ITER(num, args->pair.cdr) {
 			num = eval(num);
 			ASSERT(num->tag == Num, fprintf(stderr, "減算関数に数値以外を適用しようとしました\n"));
 			sub -= num->num;
@@ -55,7 +55,7 @@ struct Node* eval_sub(struct Node* args) {
 
 struct Node* eval_mul(struct Node* args) {
 	double pro = 1.0f;
-	ITER_REF(num, args) {
+	ITER(num, args) {
 		num = eval(num);
 		ASSERT (num->tag == Num, fprintf(stderr, "乗算関数に数値以外を適用しようとしました\n"));
 		pro *= num->num;
@@ -74,7 +74,7 @@ struct Node* eval_div(struct Node* args) {
 		struct Node* num = eval(args->pair.car);
 		ASSERT(num->tag == Num, fprintf(stderr, "除算関数に数値以外を適用しようとしました\n"));
 		double div = num->num;
-		ITER_REF(num, args->pair.cdr) {
+		ITER(num, args->pair.cdr) {
 			num = eval(num);
 			ASSERT(num->tag == Num, fprintf(stderr, "除算関数に数値以外を適用しようとしました\n"));
 			ASSERT(num->num != 0.0f && num->num != -0.0f, fprintf(stderr, "ゼロで除算をしようとしました\n"));
@@ -90,7 +90,7 @@ struct Node* eval_mod(struct Node* args) {
 		struct Node* num = eval(args->pair.car);
 		ASSERT(num->tag == Num, fprintf(stderr, "剰余関数に数値以外を適用しようとしました\n"));
 		double mod = num->num;
-		ITER_REF(num, args->pair.cdr) {
+		ITER(num, args->pair.cdr) {
 			num = eval(num);
 			ASSERT(num->tag == Num, fprintf(stderr, "剰余関数に数値以外を適用しようとしました\n"));
 			ASSERT(num->num != 0.0f && num->num != -0.0f, fprintf(stderr, "ゼロでの剰余を求めようとしました\n"));
@@ -108,7 +108,7 @@ struct Node* eval_not(struct Node* arg) {
 
 struct Node* eval_and(struct Node* args) {
 	bool acc = true;
-	ITER_REF(b, args) {
+	ITER(b, args) {
 		b = eval(b);
 		ASSERT(b->tag == Bool, fprintf(stderr, "真偽値型以外にandは適用できません\n"));
 		acc &= b->boolean;
@@ -118,7 +118,7 @@ struct Node* eval_and(struct Node* args) {
 
 struct Node* eval_or(struct Node* args) {
 	bool acc = false;
-	ITER_REF(b, args) {
+	ITER(b, args) {
 		b = eval(b);
 		ASSERT (b->tag == Bool, fprintf(stderr, "真偽値型以外にorは適用できません\n"));
 		acc |= b->boolean;
@@ -130,7 +130,7 @@ struct Node* eval_gret(struct Node* args) {
 	ASSERT (sexp_len(*args) >= 2, fprintf(stderr, "<には引数が2つ以上必要です\n"));
 	struct Node* left = eval(args->pair.car);
 	ASSERT (left->tag == Num, fprintf(stderr, "大小関係を比較できるのは数値だけです\n"));
-	ITER_REF(right, args->pair.cdr) {
+	ITER(right, args->pair.cdr) {
 		right = eval(right);
 		ASSERT (right->tag == Num, fprintf(stderr, "大小関係を比較できるのは数値だけです\n"));
 		if (left->num >= right->num) {
@@ -144,7 +144,7 @@ struct Node* eval_less(struct Node* args) {
 	ASSERT (sexp_len(*args) >= 2, fprintf(stderr, ">には引数が2つ以上必要です\n"));
 	struct Node* left = eval(args->pair.car);
 	ASSERT(left->tag == Num, fprintf(stderr, "大小関係を比較できるのは数値だけです\n"));
-	ITER_REF(right, args->pair.cdr) {
+	ITER(right, args->pair.cdr) {
 		right = eval(right);
 		ASSERT(right->tag == Num, fprintf(stderr, "大小関係を比較できるのは数値だけです\n"));
 		if (left->num <= right->num) {
@@ -181,7 +181,7 @@ struct Node* eval_eq(struct Node* args) {
 	ASSERT(sexp_len(*args) >= 2, fprintf(stderr, "=には引数が2つ以上必要です\n"));
 	struct Node* left = eval(args->pair.car);
 	bool acc = true;
-	ITER_REF(right, args->pair.cdr) {
+	ITER(right, args->pair.cdr) {
 		right = eval(right);
 		acc &= eq(left, right);
 	}
@@ -211,7 +211,7 @@ struct Node* eval_cons(struct Node* args) {
 
 struct Node* eval_list(struct Node* args) {
 	struct Node* node = alloc_nil();
-	ITER_REF(elm, args) {
+	ITER(elm, args) {
 		elm = eval(elm);
 		node = alloc_pair(elm, node);
 	}
@@ -260,7 +260,7 @@ struct Node* eval_lambda(struct Node* args, struct Node* body) {
 		int fun_arg_num = sexp_len(*args);
 		char** fun_args = malloc(sizeof(char*) * fun_arg_num);
 		int i = 0;
-		ITER_REF(arg, args) {
+		ITER(arg, args) {
 			ASSERT (arg->tag == Symbol, fprintf(stderr, "仮引数が不正です\n"));
 			fun_args[i++] = deep_copy(arg->symbol);
 		}
@@ -287,7 +287,7 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	ASSERT (fun->fun.arg_num == sexp_len(*args), fprintf(stderr, "関数の引数の数と渡された引数の数が一致しません\n"));
 	struct Node** real_args = malloc(sizeof(struct Node*) * fun->fun.arg_num);
 	int idx = 0;
-	ITER_REF(node, args) {
+	ITER(node, args) {
 		real_args[idx++] = eval(node);
 	}
 	into_func(fun->fun.pos);
@@ -309,7 +309,7 @@ struct Node* eval_print(struct Node* arg) {
 
 struct Node* eval_progn(struct Node* args) {
 	struct Node* retval;
-	ITER_REF(node, args) {
+	ITER(node, args) {
 		retval = eval(node);
 	}
 	return retval;

@@ -14,7 +14,7 @@ int sexp_len(struct Node pair) {
 
 struct Node* idx(struct Node* list, int idx) {
 	int i = 0;
-	ITER_REF(node, list) {
+	ITER(node, list) {
 		if (idx == i++)
 			return node;
 	}
