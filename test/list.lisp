@@ -1,0 +1,5 @@
+(let l (quote (1 2 3)))
+(print l)
+(print (car l))
+(print (cdr l))
+(print (= (cons 1 (quote 2 3)) (quote 1 2 3)))
