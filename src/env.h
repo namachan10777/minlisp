@@ -24,9 +24,9 @@ struct Node* find(char* key);
 int resist(char* key, struct Node* node);
 void stack(struct Node* node);
 void into_scope();
-void exit_scope();
+void exit_scope(struct Node* ret);
 bool into_func(int pos);
-void exit_func();
+void exit_func(struct Node* ret);
 
 int get_env_size();
 struct Box* get_env();

@@ -80,7 +80,7 @@ void into_scope() {
 	APPEND(struct Box, env, env_reserved_size, env_size, part);
 }
 
-void exit_scope() {
+void exit_scope(struct Node* ret) {
 	for (int i = env_size - 1; i >= 0 && (env[i].tag != BlockHead || env[i].tag != ScopeHead); --i) {
 		//変数はGCの管理対象外なので参照しなくなった時点で消す
 		free(env[i].key);
@@ -89,6 +89,7 @@ void exit_scope() {
 	}
 	if (env[env_size].tag == ScopeHead)
 		--env_size;
+	stack(ret);
 }
 
 bool into_func(int pos) {
@@ -98,7 +99,7 @@ bool into_func(int pos) {
 	return true;
 }
 
-void exit_func() {
+void exit_func(struct Node* ret) {
 	for(int i = env_size - 1; i >= 0 && env[i].tag != BlockHead; --i) {
 		//変数名はGCの管理対象外なので参照しなくなった時点で消す
 		free(env[i].key);
@@ -107,6 +108,7 @@ void exit_func() {
 	//BlockHeadを消す
 	--env_size;
 	--callstack_size;
+	stack(ret);
 }
 
 struct Node* find(char* key) {

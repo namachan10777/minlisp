@@ -237,7 +237,7 @@ struct Node* eval_let(char* symbol, struct Node* def, struct Node* exp) {
 	def = eval(def);
 	resist(symbol, def);
 	struct Node* result = eval(exp);
-	exit_scope();
+	exit_scope(result);
 	return result;
 }
 
@@ -297,7 +297,7 @@ struct Node* eval_fun(struct Node* fun, struct Node* args) {
 	}
 	free(real_args);
 	struct Node* result = eval(fun->fun.body);
-	exit_func();
+	exit_func(result);
 	return result;
 }
 
