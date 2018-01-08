@@ -18,20 +18,20 @@ int callstack_size = 0;
 // 変数の参照の実装
 // クロージャなので定義元の変数も参照できる。
 //
-int find_idx (char* key) {
+struct Node* find (char* key) {
 	//Block内から探す
 	for (int i = env_size - 1; env[i].tag != BlockHead; --i) {
 		if (env[i].tag == Var && strcmp(key, env[i].key) == 0)
-			return i;
+			return env[i].node;
 	}
 	//funに登録されている定義場所情報から定義元変数を参照する
 	if (callstack_size > 0) {
 		for (int i = callstack[callstack_size-1]; i >= 0; --i) {
 			if (env[i].tag == Var && strcmp(key, env[i].key) == 0)
-				return i;
+				return env[i].node;
 		}
 	}
-	return -1;
+	return NULL;
 }
 
 // exernal functions
@@ -108,13 +108,6 @@ void exit_func(struct Node* ret) {
 	--env_size;
 	--callstack_size;
 	stack(ret);
-}
-
-struct Node* find(char* key) {
-	int idx;
-	if ((idx = find_idx(key)) < 0)
-		return NULL;
-	return env[idx].node;
 }
 
 int resist(char* key, struct Node* node) {
