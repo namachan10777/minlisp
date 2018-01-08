@@ -184,7 +184,7 @@ bool eq(struct Node* left, struct Node* right) {
 	case Nil: return true;
 	case Bool: return left->boolean == right->boolean;
 	case Num: return left->num == right->num;
-	case Str: return strcmp(left->str, right->str);
+	case Str: return strcmp(left->str, right->str) == 0;
 	case Symbol: return false;
 	case Pair: {
 			return eq(right->pair.car, left->pair.car) && eq(right->pair.cdr, left->pair.cdr);
