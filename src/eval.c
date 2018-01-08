@@ -3,7 +3,6 @@
 #include "env.h"
 #include "util.h"
 #include "gc.h"
-#include "macro.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>

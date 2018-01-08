@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "gc.h"
 #include "node.h"
-#include "macro.h"
+#include "util.h"
 
 char* str_slice(char* buf, const char* str, int start, int64_t end) {
 	for (int from = start, to = 0; from < end; ++from, ++to) {

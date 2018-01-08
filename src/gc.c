@@ -3,8 +3,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "gc.h"
-#include "macro.h"
 #include "env.h"
+#include "util.h"
 //ノードの数
 int node_num = 0;
 //GCを呼ばれたけども実行しなかったもののカウント。実行するとリセットする。
