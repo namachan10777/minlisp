@@ -16,12 +16,6 @@
 		return NULL; \
 	}}while(false)
 
-struct Node* deref(char* key) {
-	struct Node *node = find(key);
-	ASSERT(node != NULL, fprintf (stderr, "%s : 未定義の変数です\n", key));
-	return node;
-}
-
 //組み込み関数
 struct Node* eval_add(struct Node* args) {
 	double sum = 0.0f;
@@ -385,7 +379,7 @@ struct Node* eval (struct Node* node) {
 			return node;
 		}
 	case Symbol: {
-			return deref(node->symbol);
+			return find(node->symbol);
 		}
 	case Pair: {
 			struct Node* fun = eval(node->pair.car);
