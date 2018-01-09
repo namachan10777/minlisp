@@ -57,6 +57,9 @@ nilとはNULLのようなのもので、Boolはtrueとfalse。
 
 # if
 
+(if 条件式 trueの場合の式　falseの場合の式)
+if文より条件演算子に近い
+
 ```lisp
 (if (> 1 2) (+ 1 2) (* 1 2))
 ```
