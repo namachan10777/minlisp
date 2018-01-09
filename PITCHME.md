@@ -113,6 +113,12 @@ printf("%d\n", x);
 
 ---
 
+# defun
+(defun 名前 引数 本体)は
+(let 名前 (lambda 引数 本体))と同じ(糖衣構文)
+
+---
+
 # progn
 連続して式を実行する。
 
@@ -131,6 +137,17 @@ printf("%d\n", x);
 (progn
 	ソースコード
 )
+```
+
+---
+
+# 例
+
+階乗を求めるプログラム
+
+```lisp
+(defun fact (n) (if (< n 1) 1 (* n (fact (- n 1)))))
+(print (fact 4))
 ```
 
 ---
