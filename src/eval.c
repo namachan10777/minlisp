@@ -11,7 +11,7 @@
 
 #define ASSERT(cond, ext) do{ \
 	if (!(cond)){ \
-		fprintf(stderr, "%s:%d %s\n", __FILE__, __LINE__, __func__); \
+		fprintf(stderr, "%s:%d %s\n"); \
 		ext; \
 		return NULL; \
 	}}while(false)
