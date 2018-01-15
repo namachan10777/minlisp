@@ -34,7 +34,7 @@ char* pp(struct Node node) {
 			int len;
 			// 桁数計算
 			if (node.num > 1.0f)
-				len = (int)ceilf(log10f(abs(node.num) + 0.1f));
+				len = (int)ceil(log10(fabs(node.num) + 0.1f));
 			else
 				len = 1;
 			// 符号が負の場合は一文字増える
