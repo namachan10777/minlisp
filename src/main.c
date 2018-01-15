@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
-		printf("ファイルを一つだけ渡してください\n");
+		printf("Please pass a source file.\n");
 		return -1;
 	}
 	gc_init();

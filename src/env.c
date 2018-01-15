@@ -31,7 +31,7 @@ struct Node* find (char* key) {
 				return env[i].node;
 		}
 	}
-	fprintf(stderr, "%s : 未定義の変数です\n", key);
+	fprintf(stderr, "%s : undefined variable\n", key);
 	return NULL;
 }
 
