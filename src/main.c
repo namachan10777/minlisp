@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <gc.h>
-#include <node.h>
-#include <parser.h>
-#include <env.h>
+#include "gc.h"
+#include "node.h"
+#include "parser.h"
+#include "env.h"
 #include "eval.h"
 
 int main(int argc, char *argv[]) {
